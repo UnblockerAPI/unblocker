@@ -98,7 +98,7 @@ def main():
                 html.write(template_string)
 
             with open("/tmp/html.html", 'rb') as html:
-                template_string = html.read().decode(detect(html.read()).encoding).decode("utf-8").strip("b").split(" ")[1]
+                template_string = html.read().decode(detect(html.read())['encoding']).decode("utf-8").strip("b").split(" ")[1]
 
             unlink("/tmp/html.html")
 
