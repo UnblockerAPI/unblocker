@@ -7,3 +7,4 @@ eventlet
 requests
 beautifulsoup4
 lxml
+chardet

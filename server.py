@@ -3,10 +3,10 @@ from flask import Flask, render_template, make_response, send_from_directory, re
 from flask_sslify import SSLify
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
-from io import open as ioopen
 from os import environ, chdir, unlink
 from os.path import dirname, abspath
 from random import choice
+from subprocess import check_output
 from shutil import copyfileobj
 from re import match
 from flask_wtf.csrf import CSRFProtect
@@ -59,7 +59,7 @@ def main():
             for link in img_links:
                 image_stream = s.get(link, stream=True)
 
-                with ioopen("./tmp/img.png", "wb") as png:
+                with open("./tmp/img.png", "wb") as png:
                     copyfileobj(image_stream.raw, png)
 
                 b64_img = "data:image/png;base64," + b64encode(ioopen("./tmp/img.png", 'rb').read()).decode("utf-8").strip("b")
@@ -69,10 +69,10 @@ def main():
             for link in css_links:
                 css_stream = s.get(link, stream=True)
 
-                with ioopen("./tmp/css.css", "wb") as css:
+                with open("./tmp/css.css", "wb") as css:
                     copyfileobj(css_stream.raw, css)
 
-                with ioopen("./tmp/css.css", "r", encoding='utf-8') as css_text:
+                with open("./tmp/css.css", "r", encoding='utf-8') as css_text:
                     css_data.append(css_text.read())
 
                 unlink('./tmp/css.css')
@@ -80,10 +80,10 @@ def main():
             for link in js_links:
                 js_stream = s.get(link, stream=True)
 
-                with ioopen("./tmp/js.js", "wb") as js:
+                with open("./tmp/js.js", "wb") as js:
                     copyfileobj(js_stream.raw, js)
 
-                with ioopen("./tmp/js.js", "r", encoding='utf-8') as js_text:
+                with open("./tmp/js.js", "r", encoding='utf-8') as js_text:
                     js_data.append(js_text.read())
 
                 unlink('./tmp/js.js')
@@ -94,11 +94,11 @@ def main():
             for num, tag in enumerate(jss):
                 template_string = template_string.replace(str(tag), f"<script>{js_data[num]}</script>")
 
-            with ioopen("./tmp/html.html", 'wb') as html:
+            with open("./tmp/html.html", 'wb') as html:
                 html.write(template_string)
 
-            with ioopen("./tmp/html.html", 'r', encoding='utf-8') as html_r:
-                template_string = html_r.read()
+            with open("./tmp/html.html", 'rb') as html:
+                template_string = html.read().decode(check_output("chardetect ./tmp/html.html").decode("utf-8").strip("b").split(" ")[1])
 
             unlink("./tmp/html.html")
 
