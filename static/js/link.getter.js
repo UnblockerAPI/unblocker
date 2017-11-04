@@ -24,8 +24,8 @@ $(document).ready(function() {
             $("#output").html(data);
         })
         .fail(function(xhr, status, error) {
-            window.open().document.write(xhr.responseText);
             $("#output").html('');
+            window.open().document.write(xhr.responseText);
         });
     });
 });
