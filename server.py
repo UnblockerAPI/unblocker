@@ -3,8 +3,8 @@ from flask import Flask, render_template, make_response, send_from_directory, re
 from flask_sslify import SSLify
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
-from os import environ, chdir, unlink
-from os.path import dirname, abspath
+from os import environ, chdir, unlink, mkdir
+from os.path import dirname, abspath, exists
 from random import choice
 from shutil import copyfileobj
 from re import match
@@ -55,37 +55,40 @@ def main():
             css_data = []
             js_data = []
 
+            if not exists("./tmp"):
+                mkdir("./tmp")
+
             for link in img_links:
                 image_stream = s.get(link, stream=True)
 
-                with open("img.png", "wb") as png:
+                with open("./tmp/img.png", "wb") as png:
                     copyfileobj(image_stream.raw, png)
 
-                b64_img = "data:image/png;base64," + b64encode(open("img.png", 'rb').read()).decode("utf-8").strip("b")
+                b64_img = "data:image/png;base64," + b64encode(open("./tmp/img.png", 'rb').read()).decode("utf-8").strip("b")
                 template_string = template_string.replace(link, b64_img)
-                unlink("img.png")
+                unlink("./tmp/img.png")
 
             for link in css_links:
                 css_stream = s.get(link, stream=True)
 
-                with open("css.css", "wb") as css:
+                with open("./tmp/css.css", "wb") as css:
                     copyfileobj(css_stream.raw, css)
 
-                with open("css.css", "r") as css_text:
+                with open("./tmp/css.css", "r") as css_text:
                     css_data.append(css_text.read())
 
-                unlink('css.css')
+                unlink('./tmp/css.css')
 
             for link in js_links:
                 js_stream = s.get(link, stream=True)
 
-                with open("js.js", "wb") as js:
+                with open("./tmp/js.js", "wb") as js:
                     copyfileobj(js_stream.raw, js)
 
-                with open("js.js", "r") as js_text:
+                with open("./tmp/js.js", "r") as js_text:
                     js_data.append(js_text.read())
 
-                unlink('js.js')
+                unlink('./tmp/js.js')
 
             for num, tag in enumerate(css):
                 template_string = template_string.replace(str(tag), f"<style>{css_data[num]}</style>")
@@ -93,13 +96,13 @@ def main():
             for num, tag in enumerate(jss):
                 template_string = template_string.replace(str(tag), f"<script>{js_data[num]}</script>")
 
-            with open("html.html", 'wb') as html:
+            with open("./tmp/html.html", 'wb') as html:
                 html.write(template_string)
 
-            with open("html.html", 'r') as html:
+            with open("./tmp/html.html", 'r') as html:
                 template_string = html.read()
 
-            unlink("html.html")
+            unlink("./tmp/html.html")
 
             return template_string
 
