@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 from os import environ, chdir, unlink
 from os.path import dirname, abspath
 from random import choice
-from subprocess import check_output
+from chardet import detect
 from shutil import copyfileobj
 from re import match
 from flask_wtf.csrf import CSRFProtect
@@ -98,7 +98,7 @@ def main():
                 html.write(template_string)
 
             with open("/tmp/html.html", 'rb') as html:
-                template_string = html.read().decode(check_output("chardetect /tmp/html.html").decode("utf-8").strip("b").split(" ")[1])
+                template_string = html.read().decode(detect(html.read()).encoding).decode("utf-8").strip("b").split(" ")[1]
 
             unlink("/tmp/html.html")
 
