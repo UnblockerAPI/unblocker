@@ -3,8 +3,8 @@ from flask import Flask, render_template, make_response, send_from_directory, re
 from flask_sslify import SSLify
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
-from os import environ, chdir, unlink, mkdir
-from os.path import dirname, abspath, exists
+from os import environ, chdir, unlink
+from os.path import dirname, abspath
 from random import choice
 from shutil import copyfileobj
 from re import match
@@ -55,9 +55,6 @@ def main():
             css_data = []
             js_data = []
 
-            if not exists("./tmp"):
-                mkdir("./tmp")
-
             for link in img_links:
                 image_stream = s.get(link, stream=True)
 
@@ -99,8 +96,8 @@ def main():
             with open("./tmp/html.html", 'wb') as html:
                 html.write(template_string)
 
-            with open("./tmp/html.html", 'r') as html:
-                template_string = html.read()
+            with open("./tmp/html.html", 'r') as html_r:
+                template_string = html_r.read()
 
             unlink("./tmp/html.html")
 
