@@ -59,17 +59,17 @@ def main():
             for link in img_links:
                 image_stream = s.get(link, stream=True)
 
-                with ioopen("./tmp/img.png", "wb", encoding='utf-8') as png:
+                with ioopen("./tmp/img.png", "wb") as png:
                     copyfileobj(image_stream.raw, png)
 
-                b64_img = "data:image/png;base64," + b64encode(ioopen("./tmp/img.png", 'rb', encoding='utf-8').read()).decode("utf-8").strip("b")
+                b64_img = "data:image/png;base64," + b64encode(ioopen("./tmp/img.png", 'rb').read()).decode("utf-8").strip("b")
                 template_string = template_string.replace(link, b64_img)
                 unlink("./tmp/img.png")
 
             for link in css_links:
                 css_stream = s.get(link, stream=True)
 
-                with ioopen("./tmp/css.css", "wb", encoding='utf-8') as css:
+                with ioopen("./tmp/css.css", "wb") as css:
                     copyfileobj(css_stream.raw, css)
 
                 with ioopen("./tmp/css.css", "r", encoding='utf-8') as css_text:
@@ -80,7 +80,7 @@ def main():
             for link in js_links:
                 js_stream = s.get(link, stream=True)
 
-                with ioopen("./tmp/js.js", "wb", encoding='utf-8') as js:
+                with ioopen("./tmp/js.js", "wb") as js:
                     copyfileobj(js_stream.raw, js)
 
                 with ioopen("./tmp/js.js", "r", encoding='utf-8') as js_text:
@@ -94,7 +94,7 @@ def main():
             for num, tag in enumerate(jss):
                 template_string = template_string.replace(str(tag), f"<script>{js_data[num]}</script>")
 
-            with ioopen("./tmp/html.html", 'wb', encoding='utf-8') as html:
+            with ioopen("./tmp/html.html", 'wb') as html:
                 html.write(template_string)
 
             with ioopen("./tmp/html.html", 'r', encoding='utf-8') as html_r:
