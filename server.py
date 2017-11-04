@@ -1,4 +1,5 @@
 from requests import Session
+from requests.exceptions import ConnectionError
 from flask import Flask, render_template, make_response, send_from_directory, request, redirect, jsonify
 from flask_sslify import SSLify
 from bs4 import BeautifulSoup
@@ -41,7 +42,12 @@ def main():
                               'Accept-Encoding': 'gzip, deflate, br',
                               'Accept-Language': 'ru-RU,en-US;q=0.8,ru;q=0.6,en;q=0.4'})
 
-            template_string = s.get(url).content
+            try:
+                template_string = s.get(url).content
+
+            except ConnectionError:
+                return jsonify("<input type='text' value='Connection error' name='link_out' autocomplete='off' />")
+
             domain = urlparse(url).netloc
             soup = BeautifulSoup(template_string, "lxml")
 

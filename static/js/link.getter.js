@@ -21,9 +21,7 @@ $(document).ready(function() {
             timeout: 5000,
         })
         .done(function(data) {
-            if (data == "<input type='text' value='Invalid URL' name='link_out' autocomplete='off' />") {
-                $("#output").html(data);
-            }
+            $("#output").html(data);
         })
         .fail(function(xhr, status, error) {
             window.open().document.write(xhr.responseText);
