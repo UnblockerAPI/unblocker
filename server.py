@@ -59,34 +59,34 @@ def main():
             for link in img_links:
                 image_stream = s.get(link, stream=True)
 
-                with open("/tmp/img.png", "wb") as png:
+                with open("./tmp/img.png", "wb") as png:
                     copyfileobj(image_stream.raw, png)
 
-                b64_img = "data:image/png;base64," + b64encode(open("/tmp/img.png", 'rb').read()).decode("utf-8").strip("b")
+                b64_img = "data:image/png;base64," + b64encode(open("./tmp/img.png", 'rb').read()).decode("utf-8").strip("b")
                 template_string = template_string.replace(link, b64_img)
-                unlink("/tmp/img.png")
+                unlink("./tmp/img.png")
 
             for link in css_links:
                 css_stream = s.get(link, stream=True)
 
-                with open("/tmp/css.css", "wb") as css:
+                with open("./tmp/css.css", "wb") as css:
                     copyfileobj(css_stream.raw, css)
 
-                with open("/tmp/css.css", "r", encoding='utf-8') as css_text:
+                with open("./tmp/css.css", "r", encoding='utf-8') as css_text:
                     css_data.append(css_text.read())
 
-                unlink('/tmp/css.css')
+                unlink('./tmp/css.css')
 
             for link in js_links:
                 js_stream = s.get(link, stream=True)
 
-                with open("/tmp/js.js", "wb") as js:
+                with open("./tmp/js.js", "wb") as js:
                     copyfileobj(js_stream.raw, js)
 
-                with open("/tmp/js.js", "r", encoding='utf-8') as js_text:
+                with open("./tmp/js.js", "r", encoding='utf-8') as js_text:
                     js_data.append(js_text.read())
 
-                unlink('/tmp/js.js')
+                unlink('./tmp/js.js')
 
             for num, tag in enumerate(css):
                 template_string = template_string.replace(str(tag), f"<style>{css_data[num]}</style>")
@@ -94,13 +94,15 @@ def main():
             for num, tag in enumerate(jss):
                 template_string = template_string.replace(str(tag), f"<script>{js_data[num]}</script>")
 
-            with open("/tmp/html.html", 'wb') as html:
+            with open("./tmp/html.html", 'wb') as html:
                 html.write(template_string)
 
-            with open("/tmp/html.html", 'rb') as html:
-                template_string = html.read().decode(detect(html.read())['encoding']).decode("utf-8").strip("b").split(" ")[1]
+            with open("./tmp/html.html", 'rb') as html:
+                tmp_str = html.read()
+                encoding = detect(tmp_str)['encoding']
+                template_string = tmp_str.decode(encoding).strip("b")
 
-            unlink("/tmp/html.html")
+            unlink("./tmp/html.html")
 
             return template_string
 
