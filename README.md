@@ -1,8 +1,8 @@
-# rutracker-magnet
-Rutracker magnet-links extractor.
+# unblocker
+Read-only access to blocked websites.
 
 ***Deployed on:***
 
-https://rutrackermagnet-webapp.herokuapp.com/
+https://unblocker-webapp.herokuapp.com/
 
 By @limitedeternity. Feel free to contribute.
