@@ -1,0 +1,27 @@
+{
+  "name": "rutracker-magnet",
+  "description": "Rutracker magnet-links extractor",
+  "scripts": {
+  },
+  "env": {
+    "LOGDNA_KEY": {
+      "required": true
+    },
+    "PYTHONHASHSEED": {
+      "required": true
+    },
+    "PYTHONIOENCODING": {
+      "required": true
+    }
+  },
+  "formation": {
+  },
+  "addons": [
+    "logdna"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ]
+}

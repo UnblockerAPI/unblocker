@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Unblocker</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+                <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta http-equiv="Cache-Control" content="max-age=0" />
+                <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+                <meta name="robots" content="index, nofollow" />
+		<meta name="googlebot" content="index, nofollow" />
+                <meta name="google" content="notranslate" />
+                <meta name="yandex" content="index, nofollow" />
+                <meta name="keywords" content="разблокировка, блокировка, РКН, роскомнадзор, впн, vpn" />
+                <meta name="description" content="Утилита для просмотра информации по ссылке в условиях блокировки ресурса." />
+                <meta name="author" content="limitedeternity" />
+		<link rel="stylesheet" type="text/css" href="/css/main.css" />
+		<link rel="shortcut icon" type=image/png href="/images/favicon.png" />
+		<noscript><link rel="stylesheet" type="text/css" href="/css/noscript.css" /></noscript>
+	</head>
+	<body>
+
+			<div id="page-wrapper">
+
+					<div id="wrapper">
+
+							<section class="panel banner right">
+								<div class="content color0 span-3-75">
+									<h1 class="major">Hey there!</h1>
+									<p>This is <strong>Unblocker</strong>, an utility to view websites, blocked by ISP. <br>
+									 It uses server-side template modification, so it's perfect, if you want to have read-only access to some link.</p>
+									<form action="/" method="post" id="input">
+											<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+											<div class="field">
+												<input type="text" name="link_in" value="" placeholder="https://" autocomplete="off" />
+												<div style=width:100%;height:5px;clear:both></div>
+												<div id="output"></div>
+											</div>
+											<ul class="actions">
+												<li><button type="submit" class="button special color1 circle icon fa-angle-double-down">Proceed</button></li>
+											</ul>
+									</form>		
+								</div>
+								<div class="image filtered span-1-75" data-position="90% 90%">
+									<img src="images/pic01.jpg" alt="" />
+								</div>
+							</section>
+
+							<section class="panel spotlight medium right" id="first">
+								<div class="content span-7">
+									<h2 class="major">What is this?</h2>
+									<p>A project I made in a few minutes to help my friend from Russia, where government has restricted access to large amount of sites. <br>
+									But for me it was just a challenge. Something like: <br> "I can't do it? Pff... Of course I can!" <br>
+									So, that's it. <br>
+									
+									My GitHub: @limitedeternity.</p>
+								</div>
+								<div class="image filtered tinted" data-position="top left">
+									<img src="images/pic02.jpg" alt="" />
+								</div>
+							</section>
+					</div>
+			</div>
+
+			<script type="text/javascript" src="/js/production.js"></script>
+			<script type="text/javascript" src="/js/link.getter.js"></script>
+
+	</body>
+</html>
