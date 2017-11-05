@@ -150,7 +150,12 @@ def main():
                 template_string = template_string.replace(str(tag), f"<img src={img_data[num]}></img>")
 
             encoding = UnicodeDammit(template_string).original_encoding
-            template_string = template_string.decode(encoding).strip("b")
+
+            try:
+                template_string = template_string.decode(encoding).strip("b")
+
+            except UnicodeDecodeError:
+                pass
 
             return template_string
 
