@@ -68,7 +68,7 @@ def main():
                 if link.startswith("/"):
                     tmp_link = f"{protocol}://{domain}{link}"
 
-                else if link.startswith("."):
+                elif link.startswith("."):
                     tmp_link = f"{protocol}://{domain}{link.replace('.', '')}"
 
                 else:
@@ -86,7 +86,7 @@ def main():
                 if link.startswith("/"):
                     tmp_link = f"{protocol}://{domain}{link}"
 
-                else if link.startswith("."):
+                elif link.startswith("."):
                     tmp_link = f"{protocol}://{domain}{link.replace(".", '')}"
 
                 else:
@@ -108,7 +108,7 @@ def main():
                 if link.startswith("/"):
                     tmp_link = f"{protocol}://{domain}{link}"
 
-                else if link.startswith("."):
+                elif link.startswith("."):
                     tmp_link = f"{protocol}://{domain}{link.replace(".", '')}"
 
                 else:
