@@ -87,7 +87,7 @@ def main():
                     tmp_link = f"{protocol}://{domain}{link}"
 
                 elif link.startswith("."):
-                    tmp_link = f"{protocol}://{domain}{link.replace(".", '')}"
+                    tmp_link = f"{protocol}://{domain}{link.replace('.', '')}"
 
                 else:
                     tmp_link = f"{protocol}://{domain}/{link}"
@@ -109,7 +109,7 @@ def main():
                     tmp_link = f"{protocol}://{domain}{link}"
 
                 elif link.startswith("."):
-                    tmp_link = f"{protocol}://{domain}{link.replace(".", '')}"
+                    tmp_link = f"{protocol}://{domain}{link.replace('.', '')}"
 
                 else:
                     tmp_link = f"{protocol}://{domain}/{link}"
