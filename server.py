@@ -29,7 +29,6 @@ if not debug:
 @app.route('/', methods=['GET', 'POST'])
 def main():
     if request.method == 'POST':
-        template_string = None
         url = request.form.get('link_in', '')
 
         if match(r"http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", url):
@@ -60,6 +59,7 @@ def main():
             css_links = [urlparse(x['href']).path for x in css]
             js_links = [urlparse(x['src']).path for x in jss]
 
+            img_data = []
             css_data = []
             js_data = []
 
@@ -69,8 +69,7 @@ def main():
                 with open("./tmp/img.png", "wb") as png:
                     copyfileobj(image_stream.raw, png)
 
-                b64_img = "data:image/png;base64," + b64encode(open("./tmp/img.png", 'rb').read()).decode("utf-8").strip("b")
-                template_string = template_string.replace(link, b64_img)
+                img_data.append("data:image/png;base64," + b64encode(open("./tmp/img.png", 'rb').read()).decode("utf-8").strip("b"))
                 unlink("./tmp/img.png")
 
             for link in css_links:
@@ -100,6 +99,9 @@ def main():
 
             for num, tag in enumerate(jss):
                 template_string = template_string.replace(str(tag), f"<script>{js_data[num]}</script>")
+
+            for num, tag in enumerate(img):
+                template_string = template_string.replace(str(tag), f"<img src={img_data[num]}></img>")
 
             with open("./tmp/html.html", 'wb') as html:
                 html.write(template_string)
