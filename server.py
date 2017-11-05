@@ -102,7 +102,7 @@ def main():
                         tmp_css = css_text.read()
 
                     encoding = UnicodeDammit(tmp_css).original_encoding
-                    css_data.append(tmp_css.decode(encoding).strip("b"))
+                    css_data.append(tmp_css.decode(encoding, "replace").strip("b"))
 
                 except UnicodeDecodeError:
                     css_data.append("/* failed to decode */")
@@ -129,7 +129,7 @@ def main():
                         tmp_js = js_text.read()
 
                     encoding = UnicodeDammit(tmp_js).original_encoding
-                    js_data.append(tmp_js.decode(encoding).strip("b"))
+                    js_data.append(tmp_js.decode(encoding, "replace").strip("b"))
 
                 except UnicodeDecodeError:
                     js_data.append("// failed to decode")
@@ -148,10 +148,10 @@ def main():
             encoding = UnicodeDammit(template_string).original_encoding
 
             try:
-                template_string = template_string.decode(encoding).strip("b")
+                template_string = template_string.decode(encoding, "replace").strip("b")
 
             except UnicodeDecodeError:
-                pass
+                return "Unable to decode template."
 
             return template_string
 
