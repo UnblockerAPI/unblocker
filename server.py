@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from requests import Session
 from requests.exceptions import ConnectionError
 from flask import Flask, render_template, make_response, send_from_directory, request, redirect, jsonify
