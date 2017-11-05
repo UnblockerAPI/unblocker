@@ -52,9 +52,9 @@ def main():
             protocol = urlparse(url).scheme
             soup = BeautifulSoup(template_string, "lxml")
 
-            imgs = [x for x in soup.findAll('img', {"src": True}) if urlparse(x['src']).netloc in (domain, None)]
-            css = [x for x in soup.findAll('link', {'rel': 'stylesheet'}) if urlparse(x['href']).netloc in (domain, None)]
-            jss = [x for x in soup.findAll('script', {"src": True}) if urlparse(x['src']).netloc in (domain, None)]
+            imgs = [x for x in soup.findAll('img', {"src": True}) if urlparse(x['src']).netloc in (domain, '')]
+            css = [x for x in soup.findAll('link', {'rel': 'stylesheet'}) if urlparse(x['href']).netloc in (domain, '')]
+            jss = [x for x in soup.findAll('script', {"src": True}) if urlparse(x['src']).netloc in (domain, '')]
 
             img_links = [urlparse(x['src']).path for x in imgs]
             css_links = [urlparse(x['href']).path for x in css]
