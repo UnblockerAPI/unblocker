@@ -81,6 +81,7 @@ def main():
                 with open("./tmp/css.css", "rb") as css_text:
                     tmp_str = css_text.read()
                     encoding = detect(tmp_str)['encoding']
+                    encoding = "utf-8" if encoding is None
                     css_data.append(tmp_str.decode(encoding).strip("b"))
 
                 unlink('./tmp/css.css')
@@ -94,6 +95,7 @@ def main():
                 with open("./tmp/js.js", "rb") as js_text:
                     tmp_str = js_text.read()
                     encoding = detect(tmp_str)['encoding']
+                    encoding = "utf-8" if encoding is None
                     js_data.append(tmp_str.decode(encoding).strip("b"))
 
                 unlink('./tmp/js.js')
