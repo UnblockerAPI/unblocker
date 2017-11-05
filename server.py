@@ -104,7 +104,7 @@ def main():
             for num, tag in enumerate(jss):
                 template_string = template_string.replace(str(tag), f"<script>{js_data[num]}</script>")
 
-            for num, tag in enumerate(img):
+            for num, tag in enumerate(imgs):
                 template_string = template_string.replace(str(tag), f"<img src={img_data[num]}></img>")
 
             with open("./tmp/html.html", 'wb') as html:
