@@ -79,7 +79,9 @@ def main():
                     copyfileobj(css_stream.raw, css)
 
                 with open("./tmp/css.css", "r", encoding='utf-8') as css_text:
-                    css_data.append(css_text.read())
+                    tmp_str = css_text.read()
+                    encoding = detect(tmp_str)['encoding']
+                    css_data.append(tmp_str.decode(encoding).strip("b"))
 
                 unlink('./tmp/css.css')
 
@@ -90,7 +92,9 @@ def main():
                     copyfileobj(js_stream.raw, js)
 
                 with open("./tmp/js.js", "r", encoding='utf-8') as js_text:
-                    js_data.append(js_text.read())
+                    tmp_str = js_text.read()
+                    encoding = detect(tmp_str)['encoding']
+                    js_data.append(tmp_str.decode(encoding).strip("b"))
 
                 unlink('./tmp/js.js')
 
