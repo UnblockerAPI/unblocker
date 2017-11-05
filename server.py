@@ -98,9 +98,13 @@ def main():
                     copyfileobj(css_stream.raw, css)
 
                 with open("./tmp/css.css", "rb") as css_text:
-                    tmp_css = css_text.read()
-                    encoding = UnicodeDammit(tmp_css).original_encoding
-                    css_data.append(tmp_css.decode(encoding).strip("b"))
+                    try:
+                        tmp_css = css_text.read()
+                        encoding = UnicodeDammit(tmp_css).original_encoding
+                        css_data.append(tmp_css.decode(encoding).strip("b"))
+
+                    except UnicodeDecodeError:
+                        css_data.append("/* failed to decode */")
 
                 unlink('./tmp/css.css')
 
@@ -120,9 +124,13 @@ def main():
                     copyfileobj(js_stream.raw, js)
 
                 with open("./tmp/js.js", "rb") as js_text:
-                    tmp_js = js_text.read()
-                    encoding = UnicodeDammit(tmp_js).original_encoding
-                    js_data.append(tmp_js.decode(encoding).strip("b"))
+                    try:
+                        tmp_js = js_text.read()
+                        encoding = UnicodeDammit(tmp_js).original_encoding
+                        js_data.append(tmp_js.decode(encoding).strip("b"))
+
+                    except UnicodeDecodeError:
+                        js_data.append("// failed to decode")
 
                 unlink('./tmp/js.js')
 
@@ -135,15 +143,8 @@ def main():
             for num, tag in enumerate(imgs):
                 template_string = template_string.replace(str(tag), f"<img src={img_data[num]}></img>")
 
-            with open("./tmp/html.html", 'wb') as html:
-                html.write(template_string)
-
-            with open("./tmp/html.html", 'rb') as html:
-                tmp_html = html.read()
-                encoding = UnicodeDammit(tmp_html).original_encoding
-                template_string = tmp_html.decode(encoding).strip("b")
-
-            unlink("./tmp/html.html")
+            encoding = UnicodeDammit(template_string).original_encoding
+            template_string = template_string.decode(encoding).strip("b")
 
             return template_string
 
