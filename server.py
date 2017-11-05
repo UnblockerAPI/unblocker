@@ -79,8 +79,10 @@ def main():
                 with open("./tmp/css.css", "wb") as css:
                     copyfileobj(css_stream.raw, css)
 
-                with open("./tmp/css.css", "r") as css_text:
-                    css_data.append(css_text.read())
+                with open("./tmp/css.css", "rb") as css_text:
+                    tmp_css = css_text.read()
+                    encoding = UnicodeDammit(tmp_css).original_encoding
+                    css_data.append(tmp_css.decode(encoding).strip("b"))
 
                 unlink('./tmp/css.css')
 
@@ -90,8 +92,10 @@ def main():
                 with open("./tmp/js.js", "wb") as js:
                     copyfileobj(js_stream.raw, js)
 
-                with open("./tmp/js.js", "r") as js_text:
-                    js_data.append(js_text.read())
+                with open("./tmp/js.js", "rb") as js_text:
+                    tmp_js = js_text.read()
+                    encoding = UnicodeDammit(tmp_js).original_encoding
+                    js_data.append(tmp_js.decode(encoding).strip("b"))
 
                 unlink('./tmp/js.js')
 
@@ -107,8 +111,10 @@ def main():
             with open("./tmp/html.html", 'wb') as html:
                 html.write(template_string)
 
-            with open("./tmp/html.html", 'r') as html:
-                template_string = html.read()
+            with open("./tmp/html.html", 'rb') as html:
+                tmp_html = html.read()
+                encoding = UnicodeDammit(tmp_html).original_encoding
+                template_string = tmp_html.decode(encoding).strip("b")
 
             unlink("./tmp/html.html")
 
