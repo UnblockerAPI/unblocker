@@ -94,14 +94,17 @@ def main():
 
                 css_stream = s.get(tmp_link, stream=True)
 
-                with open("./tmp/css.css", "wb") as css:
-                    copyfileobj(css_stream.raw, css)
+                css = open("./tmp/css.css", "wb")
+                copyfileobj(css_stream.raw, css)
+                css.close()
 
                 try:
-                    with open("./tmp/css.css", "rb") as css_text:
-                        tmp_css = css_text.read()
-                        encoding = UnicodeDammit(tmp_css).original_encoding
-                        css_data.append(tmp_css.decode(encoding).strip("b"))
+                    css_text = open("./tmp/css.css", "rb")
+                    tmp_css = css_text.read()
+                    css_text.close()
+
+                    encoding = UnicodeDammit(tmp_css).original_encoding
+                    css_data.append(tmp_css.decode(encoding).strip("b"))
 
                 except UnicodeDecodeError:
                     css_data.append("/* failed to decode */")
@@ -120,14 +123,17 @@ def main():
 
                 js_stream = s.get(tmp_link, stream=True)
 
-                with open("./tmp/js.js", "wb") as js:
-                    copyfileobj(js_stream.raw, js)
+                js = open("./tmp/js.js", "wb")
+                copyfileobj(js_stream.raw, js)
+                js.close()
 
                 try:
-                    with open("./tmp/js.js", "rb") as js_text:
-                        tmp_js = js_text.read()
-                        encoding = UnicodeDammit(tmp_js).original_encoding
-                        js_data.append(tmp_js.decode(encoding).strip("b"))
+                    js_text = open("./tmp/js.js", "rb")
+                    tmp_js = js_text.read()
+                    js_text.close()
+
+                    encoding = UnicodeDammit(tmp_js).original_encoding
+                    js_data.append(tmp_js.decode(encoding).strip("b"))
 
                 except UnicodeDecodeError:
                     js_data.append("// failed to decode")
