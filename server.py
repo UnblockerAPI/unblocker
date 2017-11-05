@@ -79,10 +79,9 @@ def main():
                     copyfileobj(css_stream.raw, css)
 
                 with open("./tmp/css.css", "rb") as css_text:
-                    tmp_str = css_text.read()
-                    encoding = detect(tmp_str)['encoding']
-                    encoding = "utf-8" if encoding is None
-                    css_data.append(tmp_str.decode(encoding).strip("b"))
+                    tmp_css = css_text.read()
+                    css_encoding = detect(tmp_css)['encoding']
+                    css_data.append(tmp_css.decode(css_encoding if css_encoding is not None else "utf-8").strip("b"))
 
                 unlink('./tmp/css.css')
 
@@ -93,10 +92,9 @@ def main():
                     copyfileobj(js_stream.raw, js)
 
                 with open("./tmp/js.js", "rb") as js_text:
-                    tmp_str = js_text.read()
-                    encoding = detect(tmp_str)['encoding']
-                    encoding = "utf-8" if encoding is None
-                    js_data.append(tmp_str.decode(encoding).strip("b"))
+                    tmp_js = js_text.read()
+                    js_encoding = detect(tmp_js)['encoding']
+                    js_data.append(tmp_js.decode(js_encoding if js_encoding is not None else "utf-8").strip("b"))
 
                 unlink('./tmp/js.js')
 
@@ -113,9 +111,9 @@ def main():
                 html.write(template_string)
 
             with open("./tmp/html.html", 'rb') as html:
-                tmp_str = html.read()
-                encoding = detect(tmp_str)['encoding']
-                template_string = tmp_str.decode(encoding).strip("b")
+                tmp_html = html.read()
+                html_encoding = detect(tmp_html)['encoding']
+                template_string = tmp_html.decode(html_encoding if html_encoding is not None else "utf-8").strip("b")
 
             unlink("./tmp/html.html")
 
