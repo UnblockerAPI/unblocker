@@ -18,7 +18,7 @@ $(document).ready(function() {
             type: "POST",
             dataType: "json",
             data: $("#input").serialize(),
-            timeout: 5000,
+            timeout: 15000,
         })
         .done(function(data) {
             if (data == "<input type='text' value='Connection error' name='link_out' autocomplete='off' />" || data == "<input type='text' value='Invalid URL' name='link_out' autocomplete='off' />") {

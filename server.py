@@ -94,14 +94,12 @@ def main():
 
                 css_stream = s.get(tmp_link, stream=True)
 
-                css = open("./tmp/css.css", "wb")
-                copyfileobj(css_stream.raw, css)
-                css.close()
+                with open("./tmp/css.css", "wb") as css:
+                    copyfileobj(css_stream.raw, css)
 
                 try:
-                    css_text = open("./tmp/css.css", "rb")
-                    tmp_css = css_text.read()
-                    css_text.close()
+                    with open("./tmp/css.css", "rb") as css_text:
+                        tmp_css = css_text.read()
 
                     encoding = UnicodeDammit(tmp_css).original_encoding
                     css_data.append(tmp_css.decode(encoding).strip("b"))
@@ -123,14 +121,12 @@ def main():
 
                 js_stream = s.get(tmp_link, stream=True)
 
-                js = open("./tmp/js.js", "wb")
-                copyfileobj(js_stream.raw, js)
-                js.close()
+                with open("./tmp/js.js", "wb") as js:
+                    copyfileobj(js_stream.raw, js)
 
                 try:
-                    js_text = open("./tmp/js.js", "rb")
-                    tmp_js = js_text.read()
-                    js_text.close()
+                    with open("./tmp/js.js", "rb") as js_text:
+                        tmp_js = js_text.read()
 
                     encoding = UnicodeDammit(tmp_js).original_encoding
                     js_data.append(tmp_js.decode(encoding).strip("b"))
