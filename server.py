@@ -49,21 +49,22 @@ def main():
                 return jsonify("<input type='text' value='Connection error' name='link_out' autocomplete='off' />")
 
             domain = urlparse(url).netloc
+            protocol = urlparse(url).scheme
             soup = BeautifulSoup(template_string, "lxml")
 
-            imgs = [x for x in soup.findAll('img', {"src": True}) if urlparse(x['src']).netloc == domain]
-            css = [x for x in soup.findAll('link', {'rel': 'stylesheet'}) if urlparse(x['href']).netloc == domain]
-            jss = [x for x in soup.findAll('script', {"src": True}) if urlparse(x['src']).netloc == domain]
+            imgs = [x for x in soup.findAll('img', {"src": True}) if urlparse(x['src']).netloc in (domain, None)]
+            css = [x for x in soup.findAll('link', {'rel': 'stylesheet'}) if urlparse(x['href']).netloc in (domain, None)]
+            jss = [x for x in soup.findAll('script', {"src": True}) if urlparse(x['src']).netloc in (domain, None)]
 
-            img_links = [x['src'] for x in imgs]
-            css_links = [x['href'] for x in css]
-            js_links = [x['src'] for x in jss]
+            img_links = [urlparse(x['src']).path for x in imgs]
+            css_links = [urlparse(x['href']).path for x in css]
+            js_links = [urlparse(x['src']).path for x in jss]
 
             css_data = []
             js_data = []
 
             for link in img_links:
-                image_stream = s.get(link, stream=True)
+                image_stream = s.get(f"{protocol}://{domain}{link}" if link.startswith("/") else f"{scheme}://{domain}/{link}", stream=True)
 
                 with open("./tmp/img.png", "wb") as png:
                     copyfileobj(image_stream.raw, png)
@@ -73,7 +74,7 @@ def main():
                 unlink("./tmp/img.png")
 
             for link in css_links:
-                css_stream = s.get(link, stream=True)
+                css_stream = s.get(f"{scheme}://{domain}{link}" if link.startswith("/") else f"{scheme}://{domain}/{link}", stream=True)
 
                 with open("./tmp/css.css", "wb") as css:
                     copyfileobj(css_stream.raw, css)
@@ -84,7 +85,7 @@ def main():
                 unlink('./tmp/css.css')
 
             for link in js_links:
-                js_stream = s.get(link, stream=True)
+                js_stream = s.get(f"{scheme}://{domain}{link}" if link.startswith("/") else f"{scheme}://{domain}/{link}", stream=True)
 
                 with open("./tmp/js.js", "wb") as js:
                     copyfileobj(js_stream.raw, js)
