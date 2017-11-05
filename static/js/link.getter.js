@@ -21,11 +21,18 @@ $(document).ready(function() {
             timeout: 5000,
         })
         .done(function(data) {
-            $("#output").html(data);
+            if (data == "<input type='text' value='Connection error' name='link_out' autocomplete='off' />" || data == "<input type='text' value='Invalid URL' name='link_out' autocomplete='off' />") {
+                $("#output").html(data);
+                
+            } else {
+                window.open().document.write(data);
+            }
         })
         .fail(function(xhr, status, error) {
-            $("#output").html('');
             window.open().document.write(xhr.responseText);
+        })
+        .always(function(){
+            $("#output").html('');
         });
     });
 });
