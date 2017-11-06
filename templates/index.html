@@ -6,7 +6,6 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
                 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta http-equiv="Cache-Control" content="max-age=0" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
                 <meta name="robots" content="index, nofollow" />
 		<meta name="googlebot" content="index, nofollow" />
@@ -33,7 +32,11 @@
 									<form action="/" method="post" id="input">
 											<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 											<div class="field">
-												<input type="text" name="link_in" value="" placeholder="https://" autocomplete="off" />
+												{% if link_in %}
+												    <input type="text" id="link_in" name="link_in" value="{{ link_in }}" placeholder="URL" autocomplete="off" />
+												{% else %}
+												    <input type="text" id="link_in" name="link_in" value="" placeholder="URL" autocomplete="off" />
+												{% endif %}
 												<div style=width:100%;height:5px;clear:both></div>
 												<div id="output"></div>
 											</div>
@@ -43,7 +46,7 @@
 									</form>		
 								</div>
 								<div class="image filtered span-1-75" data-position="90% 90%">
-									<img src="images/pic01.jpg" alt="" />
+									<img data-src="images/pic01.jpg" class="lazyload" alt="" />
 								</div>
 							</section>
 
@@ -57,7 +60,7 @@
 									My GitHub: @limitedeternity.</p>
 								</div>
 								<div class="image filtered tinted" data-position="top left">
-									<img src="images/pic02.jpg" alt="" />
+									<img data-src="images/pic02.jpg" class="lazyload" alt="" />
 								</div>
 							</section>
 					</div>

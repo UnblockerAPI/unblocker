@@ -18,21 +18,30 @@ $(document).ready(function() {
             type: "POST",
             dataType: "json",
             data: $("#input").serialize(),
-            timeout: 15000,
+            timeout: 45000,
         })
         .done(function(data) {
             if (data == "<input type='text' value='Connection error' name='link_out' autocomplete='off' />" || data == "<input type='text' value='Invalid URL' name='link_out' autocomplete='off' />") {
                 $("#output").html(data);
                 
             } else {
+                $("#output").html('');
                 window.open().document.write(data);
             }
         })
         .fail(function(xhr, status, error) {
-            window.open().document.write(xhr.responseText);
-        })
-        .always(function(){
             $("#output").html('');
+            window.open().document.write(xhr.responseText);
         });
     });
+});
+
+$(window).load(function() {
+    $('.lazyload').each(function() {
+        $(this).attr('src', $(this).attr('data-src'));
+    });
+
+    if ($("#link_in").val() != "") {
+        $("#input").submit();
+    }
 });
