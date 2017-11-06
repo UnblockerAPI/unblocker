@@ -5,7 +5,4 @@ CacheControl
 gunicorn
 eventlet
 requests
-requests[socks]
 beautifulsoup4
-lxml
-chardet
