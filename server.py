@@ -101,7 +101,7 @@ def get_data(url):
                 base = "http://127.0.0.1:5000"
 
             else:
-                base = "https://unblock-webapp.herokuapp.com"
+                base = "https://unblocker-webapp.herokuapp.com"
 
             for num, link in enumerate(a_links):
                 if urlparse(link).scheme is not '' and urlparse(link).netloc is not '':
