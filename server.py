@@ -51,22 +51,15 @@ def get_data(url):
                     if debug:
                         print("Connection established.")
 
-                headers = response.headers
-                content = response.content
+                content = response.text
 
             except ConnectionError:
                 return jsonify("<input type='text' value='Connection error' name='link_out' autocomplete='off' />")
 
-            if "charset" in headers['Content-Type']:
-                template_encoding = [x.strip() for x in headers['Content-Type'].split(";") if "charset" in x][0].split("=")[1]
-
-            else:
-                template_encoding = 'UTF-8'
-
             protocol = urlparse(url).scheme
             base_path = urlparse(url).path
             domain = urlparse(url).netloc
-            soup = BeautifulSoup(content.decode(template_encoding, "ignore").strip("b"), "html.parser")
+            soup = BeautifulSoup(content, "html.parser")
 
             imgs = [x for x in soup.findAll('img', {"src": True})]
             css = [x for x in soup.findAll('link', {'rel': 'stylesheet'})]
