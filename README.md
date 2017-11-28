@@ -3,11 +3,11 @@
 
 Unblocker accesses websites using Heroku servers, then retrieves template and unpacks all styles
 to `<style>` tag and scripts to `<script>` tag. Quite simple.
-Tested only on *rutracker.org*.
+Only GET-requests supported.
 
 # Features
 
-🌚 Navigation on blocked website
+🌚 Partial navigation on blocked website
 
 🌚 Uses `window.open().document.write` to output final template. Make sure to allow pop-ups.
 
