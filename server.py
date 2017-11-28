@@ -97,14 +97,18 @@ def get_data(url):
                 base = "https://unblocker-webapp.herokuapp.com"
 
             for num, link in enumerate(a_links):
-                if urlparse(link).scheme is not '' and urlparse(link).netloc is not '':
-                    a_links[num] = f"{base}?url={link}"
+                try:
+                    if urlparse(link).scheme is not '' and urlparse(link).netloc is not '':
+                        a_links[num] = f"{base}?url={link}"
 
-                elif urlparse(link).scheme is '' and urlparse(link).netloc is not '':
-                    a_links[num] = f"{base}?url={protocol}://{urlunparse(urlparse(link))}"
+                    elif urlparse(link).scheme is '' and urlparse(link).netloc is not '':
+                        a_links[num] = f"{base}?url={protocol}://{urlunparse(urlparse(link))}"
 
-                else:
-                    a_links[num] = f"{base}?url={protocol}://{domain}/{base_path.split('/')[:-1][-1]}/{link}"
+                    else:
+                        a_links[num] = f"{base}?url={protocol}://{domain}/{base_path.split('/')[:-1][-1]}/{link}"
+                
+                except IndexError:
+                    continue
 
             img_data = []
             css_data = []
