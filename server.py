@@ -2,6 +2,7 @@
 
 from requests import Session
 from requests.exceptions import ConnectionError, InvalidSchema
+from requests.adapters import HTTPAdapter
 from flask import Flask, render_template, make_response, send_from_directory, request, redirect, jsonify
 from flask_sslify import SSLify
 from bs4 import BeautifulSoup
@@ -30,6 +31,8 @@ if not debug:
 def get_data(url):
         if match(r"http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", url):
             s = CacheControl(Session())
+            s.mount('http://', HTTPAdapter(max_retries=5))
+            s.mount('https://', HTTPAdapter(max_retries=5))
 
             s.headers.update({'Upgrade-Insecure-Requests': '1',
                               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
@@ -106,7 +109,7 @@ def get_data(url):
 
                     else:
                         a_links[num] = f"{base}?url={protocol}://{domain}/{base_path.split('/')[:-1][-1]}/{link}"
-                
+
                 except IndexError:
                     continue
 
