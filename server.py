@@ -15,12 +15,14 @@ from re import match
 from flask_wtf.csrf import CSRFProtect
 from cachecontrol import CacheControl
 from base64 import b64encode
+from whitenoise import WhiteNoise
 
 
 debug = False
 
 app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = environ.get("SECRET_KEY", "".join(choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for _ in range(50)))
+app.wsgi_app = WhiteNoise(app.wsgi_app, root="static/")
 
 csrf = CSRFProtect(app)
 
@@ -257,21 +259,6 @@ def main():
     response.headers['X-XSS-Protection'] = '1; mode=block'
     response.headers['Strict-Transport-Security'] = 'max-age=31536000'
     return response
-
-
-@app.route('/images/<path:path>', methods=['GET'])
-def serve_images(path):
-    return send_from_directory('static/images', path)
-
-
-@app.route('/js/<path:path>', methods=['GET'])
-def serve_js(path):
-    return send_from_directory('static/js', path)
-
-
-@app.route('/css/<path:path>', methods=['GET'])
-def serve_css(path):
-    return send_from_directory('static/css', path)
 
 
 if __name__ == "__main__":

@@ -6,3 +6,4 @@ gunicorn
 eventlet
 requests
 beautifulsoup4
+whitenoise
