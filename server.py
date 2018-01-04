@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from requests import Session
-from requests.exceptions import ConnectionError, InvalidSchema
-from requests.adapters import HTTPAdapter
-from flask import Flask, render_template, make_response, send_from_directory, request, redirect, jsonify
-from flask_sslify import SSLify
-from bs4 import BeautifulSoup
-from urllib.parse import urlparse, urlunparse
+from base64 import b64encode
 from os import environ, chdir, unlink
 from os.path import dirname, abspath
 from random import choice
 from shutil import copyfileobj
 from re import match
+from flask import Flask, render_template, make_response, send_from_directory, request, redirect, jsonify
+from flask_sslify import SSLify
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse, urlunparse
 from flask_wtf.csrf import CSRFProtect
+from requests import Session
+from requests.exceptions import ConnectionError, InvalidSchema
+from requests.adapters import HTTPAdapter
 from cachecontrol import CacheControl
-from base64 import b64encode
 from whitenoise import WhiteNoise
 
 
@@ -24,10 +24,10 @@ app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = environ.get("SECRET_KEY", "".join(choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for _ in range(50)))
 app.wsgi_app = WhiteNoise(app.wsgi_app, root="static/")
 
-csrf = CSRFProtect(app)
-
 if not debug:
+    cache = Cache(app, config={'CACHE_TYPE': 'redis', 'CACHE_REDIS_URL': environ.get("REDIS_URL")})
     sslify = SSLify(app)
+    csrf = CSRFProtect(app)
 
 
 def get_data(url):

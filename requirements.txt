@@ -4,6 +4,8 @@ flask-sslify
 CacheControl
 gunicorn
 eventlet
+redis
+Flask-Cache
 requests
 requests[security]
 beautifulsoup4
