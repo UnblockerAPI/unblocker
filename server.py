@@ -28,7 +28,8 @@ app.wsgi_app = WhiteNoise(app.wsgi_app, root="static/")
 if not debug:
     cache = Cache(app, config={'CACHE_TYPE': 'redis', 'CACHE_REDIS_URL': environ.get("REDIS_URL")})
     sslify = SSLify(app)
-    csrf = CSRFProtect(app)
+
+csrf = CSRFProtect(app)
 
 
 def get_data(url, userAgent):
