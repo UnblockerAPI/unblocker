@@ -31,14 +31,14 @@ if not debug:
     csrf = CSRFProtect(app)
 
 
-def get_data(url):
+def get_data(url, userAgent):
         if match(r"http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", url):
             s = CacheControl(Session())
             s.mount('http://', HTTPAdapter(max_retries=5))
             s.mount('https://', HTTPAdapter(max_retries=5))
 
             s.headers.update({'Upgrade-Insecure-Requests': '1',
-                              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
+                              'User-Agent': userAgent,
                               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
                               'DNT': '1',
                               'Accept-Encoding': 'gzip, deflate, br',
@@ -246,7 +246,8 @@ def main():
         url = request.form.get('link_in', '')
 
         if url is not '':
-            return get_data(url)
+            userAgent = request.headers.get('User-Agent')
+            return get_data(url, userAgent)
 
     else:
         if request.args.get('url', '') is not '':
