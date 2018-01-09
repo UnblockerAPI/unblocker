@@ -32,7 +32,7 @@ $(document).ready(function() {
         .fail(function(xhr, status, error) {
             $("#output").html('');
             window.open().document.write(xhr.responseText);
-            window.close();
+            open(location, '_self').close();
         });
     });
 });
