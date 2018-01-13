@@ -9,7 +9,6 @@ from re import match
 from flask import Flask, render_template, make_response, send_from_directory, request, redirect, jsonify
 from flask_sslify import SSLify
 from flask_cache import Cache
-from flask_wtf.csrf import CSRFProtect
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urlunparse
 from requests import Session
@@ -28,8 +27,6 @@ app.wsgi_app = WhiteNoise(app.wsgi_app, root="static/")
 if not debug:
     cache = Cache(app, config={'CACHE_TYPE': 'redis', 'CACHE_REDIS_URL': environ.get("REDIS_URL")})
     sslify = SSLify(app)
-
-csrf = CSRFProtect(app)
 
 
 def get_data(url, userAgent):

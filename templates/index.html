@@ -31,7 +31,6 @@
 									<p>This is <strong>Unblocker</strong>, an utility to view websites, blocked by ISP. <br>
 									 It uses server-side template modification, so it's perfect, if you want to have read-only access to some link.</p>
 									<form action="/" method="post" id="input">
-											<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 											<div class="field">
 												{% if link_in %}
 												    <input type="text" id="link_in" name="link_in" value="{{ link_in }}" placeholder="URL" autocomplete="off" />
