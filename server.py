@@ -5,12 +5,14 @@ from os import environ, chdir, unlink
 from os.path import dirname, abspath
 from random import choice
 from shutil import copyfileobj
+from urllib.parse import urlparse, urlunparse
 from re import match
 from flask import Flask, render_template, make_response, send_from_directory, request, redirect, jsonify
 from flask_sslify import SSLify
+from flask_compress import Compress
 from flask_cache import Cache
+from flask_cors import CORS
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse, urlunparse
 from requests import Session
 from requests.exceptions import ConnectionError, InvalidSchema
 from requests.adapters import HTTPAdapter
@@ -19,15 +21,20 @@ from whitenoise import WhiteNoise
 
 
 debug = False
+compress = Compress()
 
 app = Flask(__name__, template_folder='templates')
 app.config['SECRET_KEY'] = environ.get("SECRET_KEY", "".join(choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for _ in range(50)))
 app.wsgi_app = WhiteNoise(app.wsgi_app, root="static/")
+app.config['COMPRESS_MIMETYPES'] = ['text/html', 'application/json']
+app.config['COMPRESS_MIN_SIZE'] = 0
 
 if not debug:
     cache = Cache(app, config={'CACHE_TYPE': 'redis', 'CACHE_REDIS_URL': environ.get("REDIS_URL")})
     sslify = SSLify(app)
+    CORS(app, origins="https://unblocker-webapp.herokuapp.com")
 
+compress.init_app(app)
 
 def get_data(url, userAgent):
         if match(r"http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", url):
@@ -63,7 +70,7 @@ def get_data(url, userAgent):
             protocol = urlparse(url).scheme
             base_path = urlparse(url).path
             domain = urlparse(url).netloc
-            soup = BeautifulSoup(content, "html.parser")
+            soup = BeautifulSoup(content, "lxml")
 
             imgs = [x for x in soup.findAll('img', {"src": True})]
             css = [x for x in soup.findAll('link', {'rel': 'stylesheet'})]
@@ -232,7 +239,7 @@ def get_data(url, userAgent):
             if debug:
                 print("Returning template...")
 
-            return str(tmp_template)
+            return jsonify(tmp_template)
 
         else:
             return jsonify("<input type='text' value='Invalid URL' name='link_out' autocomplete='off' />")

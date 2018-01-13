@@ -1,9 +1,12 @@
 Flask
 flask-sslify
+flask-cors
+flask-compress
 CacheControl
 gunicorn
 eventlet
 redis
+lxml
 Flask-Cache
 requests
 requests[security]
