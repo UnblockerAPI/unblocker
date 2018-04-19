@@ -44,69 +44,68 @@ const ssr = async (url) => {
     try {
         await page.goto(url, { waitUntil: 'load' });
 
+        await page.evaluate(({ linkBase, url }) => {
+            var links = document.querySelectorAll('a[href]');
+            
+            for (let i = 0; i < links.length; i++) {
+                if (links[i].href.match(/^(?:https?|\/)/)) {
+                    links[i].href = `${linkBase}?url=${new URL(links[i].href, url).href}`;
+                }
+            }
+    
+            var images = document.querySelectorAll('img[src]');
+    
+            for (let i = 0; i < images.length; i++) {
+                let resUrl = new URL(images[i].src, url).href;
+    
+                fetch(resUrl).then((response) => {
+                    return response.blob();
+                }).then((blob) => {
+                    let reader = new FileReader();
+                    reader.readAsDataURL(blob);
+                    reader.onloadend = () => {
+                        images[i].src = reader.result;
+                    } 
+                });
+            }
+    
+            var js = document.querySelectorAll('script[src]');
+    
+            for (let i = 0; i < js.length; i++) {
+                let resUrl = new URL(js[i].src, url).href;
+    
+                fetch(resUrl).then((response) => {
+                    return response.text();
+                }).then((contents) => {
+                    let script = document.createElement('script');
+                    script.type = 'application/javascript';
+                    script.innerHTML = contents;
+    
+                    js[i].parentNode.replaceChild(script, js[i]);
+                });
+            }
+    
+            var css = document.querySelectorAll('link[rel="stylesheet"]');
+    
+            for (let i = 0; i < css.length; i++) {
+                let resUrl = new URL(css[i].href, url).href;
+    
+                fetch(resUrl).then((response) => {
+                    return response.text();
+                }).then((contents) => {
+                    let style = document.createElement('style');
+                    style.type = 'text/css';
+                    style.innerHTML = contents;
+    
+                    css[i].parentNode.replaceChild(style, css[i]);
+                });
+            }
+    
+        }, { linkBase, url });
+
     } catch (err) {
         return {html: "<h1>Failed to load</h1>", ttRenderMs: 0};
-
     }
-
-    await page.evaluate(({ linkBase, url }) => {
-        var links = document.querySelectorAll('a[href]');
-        
-        for (let i = 0; i < links.length; i++) {
-            if (links[i].href.match(/^(?:https?|\/)/)) {
-                links[i].href = `${linkBase}?url=${new URL(links[i].href, url).href}`;
-            }
-        }
-
-        var images = document.querySelectorAll('img[src]');
-
-        for (let i = 0; i < images.length; i++) {
-            let resUrl = new URL(images[i].src, url).href;
-
-            fetch(resUrl).then((response) => {
-                return response.blob();
-            }).then((blob) => {
-                let reader = new FileReader();
-                reader.readAsDataURL(blob);
-                reader.onloadend = () => {
-                    images[i].src = reader.result;
-                } 
-            });
-        }
-
-        var js = document.querySelectorAll('script[src]');
-
-        for (let i = 0; i < js.length; i++) {
-            let resUrl = new URL(js[i].src, url).href;
-
-            fetch(resUrl).then((response) => {
-                return response.text();
-            }).then((contents) => {
-                let script = document.createElement('script');
-                script.type = 'application/javascript';
-                script.innerHTML = contents;
-
-                js[i].parentNode.replaceChild(script, js[i]);
-            });
-        }
-
-        var css = document.querySelectorAll('link[rel="stylesheet"]');
-
-        for (let i = 0; i < css.length; i++) {
-            let resUrl = new URL(css[i].href, url).href;
-
-            fetch(resUrl).then((response) => {
-                return response.text();
-            }).then((contents) => {
-                let style = document.createElement('style');
-                style.type = 'text/css';
-                style.innerHTML = contents;
-
-                css[i].parentNode.replaceChild(style, css[i]);
-            });
-        }
-
-    }, { linkBase, url });
 
     var html = await page.content();
     await browser.close();
