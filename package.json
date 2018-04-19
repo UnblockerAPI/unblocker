@@ -4,7 +4,8 @@
   "description": "Read-only access to websites.",
   "main": "server.js",
   "scripts": {
-    "start": "node pm2.js"
+    "start": "node pm2.js",
+    "postinstall": "npm ddp"
   },
   "repository": {
     "type": "git",
