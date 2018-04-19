@@ -1,0 +1,31 @@
+{
+  "name": "unblocker",
+  "version": "1.0.0",
+  "description": "Read-only access to websites.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node pm2.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/limitedeternity/unblocker.git"
+  },
+  "keywords": [],
+  "author": "Marise Hayashi <@limitedeternity> (https://limitedeternity.github.io/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/limitedeternity/unblocker/issues"
+  },
+  "engines": {
+    "node": "9.8.0",
+    "npm": "5.7.1"
+  },
+  "homepage": "https://unblocker-webapp.herokuapp.com",
+  "dependencies": {
+    "express": "^4.16.3",
+    "helmet": "^3.12.0",
+    "pm2": "^2.10.2",
+    "puppeteer": "^1.3.0",
+    "shrink-ray-current": "^2.1.0"
+  }
+}

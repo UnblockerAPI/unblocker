@@ -1,9 +1,7 @@
 # Unblocker
 > Read-only access to websites.
 
-Unblocker accesses websites using Heroku servers, then retrieves template and unpacks all styles
-to `<style>` tag and scripts to `<script>` tag. Quite simple.
-Only GET-requests supported.
+Unblocker accesses websites using Heroku servers, then uses SSR and returns to user.
 
 # Features
 

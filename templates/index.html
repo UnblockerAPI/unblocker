@@ -14,9 +14,9 @@
                 <meta name="keywords" content="разблокировка, блокировка, РКН, роскомнадзор, впн, vpn" />
                 <meta name="description" content="Утилита для просмотра информации по ссылке в условиях блокировки." />
                 <meta name="author" content="limitedeternity" />
-		<link rel="stylesheet" type="text/css" href="/css/main.css" />
-		<link rel="shortcut icon" type=image/png href="/images/favicon.png" />
-		<noscript><link rel="stylesheet" type="text/css" href="/css/noscript.css" /></noscript>
+		<link rel="stylesheet" type="text/css" href="static/css/main.css" />
+		<link rel="shortcut icon" type=image/png href="static/images/favicon.png" />
+		<noscript><link rel="stylesheet" type="text/css" href="static/css/noscript.css" /></noscript>
 	</head>
 	<body>
 
@@ -30,31 +30,27 @@
 									<h1 class="major">Hey there!</h1>
 									<p>This is <strong>Unblocker</strong>, an utility to view websites, blocked by ISP. <br>
 									 It uses server-side template modification, so it's perfect, if you want to have read-only access to some link.</p>
-									<form action="/" method="post" id="input">
+									<form action="/" id="input">
 											<div class="field">
-												{% if link_in %}
-												    <input type="text" id="link_in" name="link_in" value="{{ link_in }}" placeholder="URL" autocomplete="off" />
-												{% else %}
-												    <input type="text" id="link_in" name="link_in" value="" placeholder="URL" autocomplete="off" />
-												{% endif %}
+												<input type="text" id="url" name="url" value="" placeholder="URL" autocomplete="off" />
 												<div style=width:100%;height:5px;clear:both></div>
 												<div id="output"></div>
 											</div>
 											<ul class="actions">
-												<li><button type="submit" class="button special color1 circle icon fa-angle-double-down">Proceed</button></li>
+												<li><button type="submit" id="submit" class="button special color1 circle icon fa-angle-double-down">Proceed</button></li>
 											</ul>
 									</form>
 								</div>
 								<div class="image filtered span-1-75" data-position="90% 90%">
-									<img data-src="images/pic01.png" class="lazyload" alt="" />
+									<img data-src="static/images/pic01.png" class="lazyload" alt="" />
 								</div>
 							</section>
 					</div>
 			</div>
 
-			<script type="text/javascript" src="/js/production.js"></script>
-			<script type="text/javascript" src="/js/link.getter.js"></script>
-		        <script type="text/javascript">document.addEventListener("DOMContentLoaded", ( function() { window.scrollTo(1000, 1000) } )() );</script>
+			<script type="text/javascript" src="static/js/production.js"></script>
+			<script type="text/javascript" src="static/js/link.getter.js"></script>
+		    <script type="text/javascript">document.addEventListener("DOMContentLoaded", ( function() { window.scrollTo(1000, 1000) } )() );</script>
 
 	</body>
 </html>
