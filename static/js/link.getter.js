@@ -13,7 +13,7 @@ $(document).ready(function() {
         }
 
         var serializedData = objectifyForm(inputData);
-        if (!serializedData.url || !serializedData.url.match(/^http[s]?:\/\/rutracker\.org/)) {
+        if (!serializedData.url || !serializedData.url.match(/http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+/)) {
             $("#output").html("<input type='text' value='URL invalid' name='link_out' autocomplete='off' />");
             return;
         }

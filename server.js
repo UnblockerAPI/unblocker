@@ -47,11 +47,12 @@ const ssr = async (url) => {
 
     var page = await browser.newPage();
     page.on('dialog', async dialog => await dialog.dismiss());
+    page.setDefaultNavigationTimeout(15000);
 
     try {
         await page.goto(url, {waitUntil: 'load'});
         await Promise.all([
-            page.waitForSelector('#body_container'),
+            page.waitForSelector('body'),
             page.waitForSelector('script[src]'),
             page.waitForSelector('link[rel="stylesheet"]')
         ]);
@@ -158,7 +159,7 @@ app.use(shrinkRay());
 app.use('/static', express.static(path.join(__dirname, 'static')));
 
 app.get('/', async (req, res) => {
-    if (req.query.url && req.query.url.match(/^http[s]?:\/\/rutracker\.org/)) {
+    if (req.query.url && req.query.url.match(/http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+/)) {
         let {html, ttRenderMs} = await ssr(req.query.url);
         res.set('Server-Timing', `Prerender;dur=${ttRenderMs};desc="Render time (ms)"`);
         res.set('Content-Type', 'text/html');

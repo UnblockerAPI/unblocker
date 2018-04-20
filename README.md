@@ -1,7 +1,7 @@
 # Unblocker
 > Read-only access to websites.
 
-Unblocker accesses websites using Heroku servers, then uses SSR and returns to user. [LIMITED TO RUTRACKER.ORG]
+Unblocker accesses websites using Heroku servers, then uses SSR and returns to user.
 
 # Features
 
