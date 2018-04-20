@@ -126,7 +126,7 @@ const ssr = async (url) => {
         }, { linkBase, url });
 
     } catch (err) {
-        return {html: "<h1>Failed to load</h1>", ttRenderMs: 0};
+        return {html: "<h1>Failed to load</h1>", ttRenderMs: Date.now() - start};
     }
 
     var html = await page.content();
