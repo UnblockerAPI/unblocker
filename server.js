@@ -173,20 +173,23 @@ const ssr = async (url) => {
     return {html, ttRenderMs};
 };
 
-const app = express();
-app.use(helmet());
-app.use(shrinkRay());
-app.use('/static', express.static(path.join(__dirname, 'static')));
+setTimeout(() => {
+    const app = express();
+    app.use(helmet());
+    app.use(shrinkRay());
+    app.use('/static', express.static(path.join(__dirname, 'static')));
 
-app.get('/', async (req, res) => {
-    if (req.query.url && req.query.url.match(/http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+/)) {
-        let {html, ttRenderMs} = await ssr(req.query.url);
-        res.set('Server-Timing', `Prerender;dur=${ttRenderMs};desc="Render time (ms)"`);
-        res.set('Content-Type', 'text/html');
-        return res.send(new Buffer(html));
-    }
+    app.get('/', async (req, res) => {
+        if (req.query.url && req.query.url.match(/http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+/)) {
+            let {html, ttRenderMs} = await ssr(req.query.url);
+            res.set('Server-Timing', `Prerender;dur=${ttRenderMs};desc="Render time (ms)"`);
+            res.set('Content-Type', 'text/html');
+            return res.send(new Buffer(html));
+        }
 
-    return res.sendFile(path.join(__dirname, 'templates', 'index.html'));
-});
+        return res.sendFile(path.join(__dirname, 'templates', 'index.html'));
+    });
 
-app.listen(PORT, callbackFn);
+    app.listen(PORT, callbackFn);
+    
+}, 2000);
