@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const redis = require('redis');
 const helmet = require('helmet');
 const shrinkRay = require('shrink-ray-current');
 const puppeteer = require('puppeteer');
@@ -14,34 +13,23 @@ if (process.env.NODE_ENV === 'production') {
         console.log(`Listening on ${PORT}`);
     };
 
-    var RENDER_CACHE = redis.createClient(process.env.REDIS_URL);
-
 } else {
     var PORT = 8080;
     var linkBase = `http://127.0.0.1:${PORT}`;
     var callbackFn = () => {
         console.log(`Listening on ${PORT}`);
     };
-
-    var RENDER_CACHE = new Map();
 }
 
+var RENDER_CACHE = new Map();
+
 const ssr = async (url) => {
-    if (process.env.NODE_ENV === 'production') {
-        RENDER_CACHE.get(url, (err, reply) => {
-            if (reply) {
-                return {html: reply.toString(), ttRenderMs: 0}
-            }
-        });
+    if (RENDER_CACHE.has(url)) {
+        return {html: RENDER_CACHE.get(url), ttRenderMs: 0};
+    }
 
-    } else {
-        if (RENDER_CACHE.has(url)) {
-            return {html: RENDER_CACHE.get(url), ttRenderMs: 0};
-        }
-
-        if (RENDER_CACHE.size > 5) {
-            RENDER_CACHE.clear();
-        }
+    if (RENDER_CACHE.size > 5) {
+        RENDER_CACHE.clear();
     }
 
     var start = Date.now();
@@ -51,20 +39,19 @@ const ssr = async (url) => {
         args: [
             '--no-sandbox', 
             '--disable-setuid-sandbox',
-            '--allow-file-access-from-files',
-            '--allow-file-access',
             '--allow-cross-origin-auth-prompt',
             '--disable-web-security'
-        ],
-        ignoreHTTPSErrors: true,
-        headless: true
+        ]
     });
 
     var page = await browser.newPage();
     page.on('dialog', async (dialog) => dialog.dismiss());
 
     try {
-        await page.goto(url, { waitUntil: 'load' });
+        await Promise.all([
+            page.goto(url, { waitUntil: 'networkidle0' }),
+            page.waitForSelector('#body_container')
+        ]);
 
         await page.evaluate(({ linkBase, url }) => {
             var links = document.querySelectorAll('a[href]');
@@ -135,12 +122,7 @@ const ssr = async (url) => {
     var ttRenderMs = Date.now() - start;
     console.info(`Page rendered in: ${ttRenderMs} ms.`);
 
-    if (process.env.NODE_ENV === 'production') {
-        RENDER_CACHE.set(url, html, 'EX', 60 * 30);
-
-    } else {
-        RENDER_CACHE.set(url, html);
-    }
+    RENDER_CACHE.set(url, html);
 
     return {html, ttRenderMs};
 };
