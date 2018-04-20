@@ -4,7 +4,8 @@
   "description": "Read-only access to websites.",
   "main": "server.js",
   "scripts": {
-    "start": "node pm2.js",
+    "start": "bin/start-nginx cross-env NODE_ENV=production node pm2.js",
+    "dev": "node pm2.js",
     "postinstall": "npm ddp"
   },
   "repository": {
@@ -23,10 +24,12 @@
   },
   "homepage": "https://unblocker-webapp.herokuapp.com",
   "dependencies": {
+    "cross-env": "^5.1.4",
     "express": "^4.16.3",
     "helmet": "^3.12.0",
     "pm2": "^2.10.2",
     "puppeteer": "^1.3.0",
+    "redis": "^2.8.0",
     "shrink-ray-current": "^2.1.0"
   }
 }
