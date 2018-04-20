@@ -14,7 +14,7 @@ $(document).ready(function() {
 
         var serializedData = objectifyForm(inputData);
         if (!serializedData.url || !serializedData.url.match(/^http[s]?:\/\/rutracker\.org/)) {
-            $("#output").html("<input type='text' value='Invalid URL' name='link_out' autocomplete='off' />");
+            $("#output").html("<input type='text' value='URL invalid' name='link_out' autocomplete='off' />");
             return;
         }
 

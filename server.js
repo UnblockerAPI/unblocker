@@ -41,79 +41,104 @@ const ssr = async (url) => {
             '--disable-setuid-sandbox',
             '--allow-cross-origin-auth-prompt',
             '--disable-web-security'
-        ]
+        ],
+        headless: true
     });
 
     var page = await browser.newPage();
-    page.on('dialog', async (dialog) => dialog.dismiss());
+    page.on('dialog', async dialog => await dialog.dismiss());
 
     try {
+        await page.goto(url, {waitUntil: 'load'});
         await Promise.all([
-            page.goto(url, { waitUntil: 'networkidle0' }),
-            page.waitForSelector('#body_container')
+            page.waitForSelector('#body_container'),
+            page.waitForSelector('script[src]'),
+            page.waitForSelector('link[rel="stylesheet"]')
         ]);
 
-        await page.evaluate(({ linkBase, url }) => {
-            var links = document.querySelectorAll('a[href]');
-            
-            for (let i = 0; i < links.length; i++) {
-                if (links[i].href.match(/^(?:https?|\/)/)) {
-                    links[i].href = `${linkBase}?url=${new URL(links[i].href, url).href}`;
+        await page.evaluate(async () => {
+            await new Promise(resolve => {
+                var js = document.querySelectorAll('script[src]');
+    
+                for (let i = 0; i < js.length; i++) {
+                    let resUrl = new URL(js[i].src, location.href).href;
+    
+                    fetch(resUrl).then((response) => {
+                        return response.text();
+                    }).then((contents) => {
+                        let script = document.createElement('script');
+                        script.type = 'application/javascript';
+                        script.innerHTML = contents;
+    
+                        js[i].parentNode.replaceChild(script, js[i]);
+                    });
                 }
-            }
+
+                resolve();
+            });
+        });
+
+        await page.evaluate(async () => {
+            await new Promise(resolve => {
+                var css = document.querySelectorAll('link[rel="stylesheet"]');
     
-            var images = document.querySelectorAll('img[src]');
+                for (let i = 0; i < css.length; i++) {
+                    let resUrl = new URL(css[i].href, location.href).href;
     
-            for (let i = 0; i < images.length; i++) {
-                let resUrl = new URL(images[i].src, url).href;
+                    fetch(resUrl).then((response) => {
+                        return response.text();
+                    }).then((contents) => {
+                        let style = document.createElement('style');
+                        style.type = 'text/css';
+                        style.innerHTML = contents;
     
-                fetch(resUrl).then((response) => {
-                    return response.blob();
-                }).then((blob) => {
-                    let reader = new FileReader();
-                    reader.readAsDataURL(blob);
-                    reader.onloadend = () => {
-                        images[i].src = reader.result;
-                    } 
-                });
-            }
+                        css[i].parentNode.replaceChild(style, css[i]);
+                    });
+                }
+
+                resolve();
+            });
+        });
+
+        await page.evaluate(async ({ linkBase }) => {
+            await new Promise(resolve => {
+                var links = document.querySelectorAll('a[href]');
+            
+                for (let i = 0; i < links.length; i++) {
+                    if (links[i].href.match(/^(?:https?|\/)/)) {
+                        links[i].href = `${linkBase}?url=${new URL(links[i].href, location.href).href}`;
+                    }
+                }
+
+                resolve();
+            });
     
-            var js = document.querySelectorAll('script[src]');
+        }, { linkBase });
+
+        await page.evaluate(async () => {
+            await new Promise(resolve => {
+                var images = document.querySelectorAll('img[src]');
     
-            for (let i = 0; i < js.length; i++) {
-                let resUrl = new URL(js[i].src, url).href;
+                for (let i = 0; i < 8; i++) {
+                    let resUrl = new URL(images[i].src, location.href).href;
     
-                fetch(resUrl).then((response) => {
-                    return response.text();
-                }).then((contents) => {
-                    let script = document.createElement('script');
-                    script.type = 'application/javascript';
-                    script.innerHTML = contents;
-    
-                    js[i].parentNode.replaceChild(script, js[i]);
-                });
-            }
-    
-            var css = document.querySelectorAll('link[rel="stylesheet"]');
-    
-            for (let i = 0; i < css.length; i++) {
-                let resUrl = new URL(css[i].href, url).href;
-    
-                fetch(resUrl).then((response) => {
-                    return response.text();
-                }).then((contents) => {
-                    let style = document.createElement('style');
-                    style.type = 'text/css';
-                    style.innerHTML = contents;
-    
-                    css[i].parentNode.replaceChild(style, css[i]);
-                });
-            }
-    
-        }, { linkBase, url });
+                    fetch(resUrl).then((response) => {
+                        return response.blob();
+                    }).then((blob) => {
+                        let reader = new FileReader();
+                        reader.readAsDataURL(blob);
+                        reader.onloadend = () => {
+                            images[i].src = reader.result;
+                        } 
+                    });
+                }
+
+                resolve();
+            });
+        });
 
     } catch (err) {
-        return {html: "<h1>Failed to load</h1>", ttRenderMs: Date.now() - start};
+        return {html: `<h1>Failed to load. <br> ${err}</h1>`, ttRenderMs: Date.now() - start};
     }
 
     var html = await page.content();
