@@ -30,11 +30,10 @@ const ssr = async (url) => {
         args: [
             '--no-sandbox', 
             '--disable-setuid-sandbox',
-            '--allow-file-access-from-files',
-            '--allow-file-access', 
             '--allow-cross-origin-auth-prompt',
             '--disable-web-security'
         ],
+        ignoreHTTPSErrors: true,
         headless: true
     });
 
