@@ -27,7 +27,7 @@ pm2.connect((err) => {
     console.log(`[PM2] Started ${instances} instances of ${options.script}. Memory limit: ${maxMemory}`)
 
     pm2.launchBus((err, bus) => {
-      console.log('[PM2] Log streaming started');
+      console.log('[PM2] Log streaming started\n');
 
       bus.on('log:out', (packet) => {
         console.log('[App:%s] %s', packet.process.name, packet.data);

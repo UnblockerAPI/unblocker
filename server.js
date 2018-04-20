@@ -34,10 +34,10 @@ const ssr = async (url) => {
 
     var start = Date.now();
 
-    var browser = await puppeteer.launch({ 
+    var browser = await puppeteer.launch({
         userDataDir: __dirname + '/tmp',
         args: [
-            '--no-sandbox', 
+            '--no-sandbox',
             '--disable-setuid-sandbox',
             '--allow-cross-origin-auth-prompt',
             '--disable-web-security'
@@ -60,19 +60,24 @@ const ssr = async (url) => {
         await page.evaluate(async () => {
             await new Promise(resolve => {
                 var js = document.querySelectorAll('script[src]');
-    
+
                 for (let i = 0; i < js.length; i++) {
-                    let resUrl = new URL(js[i].src, location.href).href;
-    
-                    fetch(resUrl).then((response) => {
-                        return response.text();
-                    }).then((contents) => {
-                        let script = document.createElement('script');
-                        script.type = 'application/javascript';
-                        script.innerHTML = contents;
-    
-                        js[i].parentNode.replaceChild(script, js[i]);
-                    });
+                    try {
+                        let resUrl = new URL(js[i].src, location.href).href;
+
+                        fetch(resUrl).then((response) => {
+                            return response.text();
+                        }).then((contents) => {
+                            let script = document.createElement('script');
+                            script.type = 'application/javascript';
+                            script.innerHTML = contents;
+
+                            js[i].parentNode.replaceChild(script, js[i]);
+                        });
+
+                    } catch (err) {
+                        continue;
+                    }
                 }
 
                 resolve();
@@ -82,19 +87,24 @@ const ssr = async (url) => {
         await page.evaluate(async () => {
             await new Promise(resolve => {
                 var css = document.querySelectorAll('link[rel="stylesheet"]');
-    
+
                 for (let i = 0; i < css.length; i++) {
-                    let resUrl = new URL(css[i].href, location.href).href;
-    
-                    fetch(resUrl).then((response) => {
-                        return response.text();
-                    }).then((contents) => {
-                        let style = document.createElement('style');
-                        style.type = 'text/css';
-                        style.innerHTML = contents;
-    
-                        css[i].parentNode.replaceChild(style, css[i]);
-                    });
+                    try {
+                        let resUrl = new URL(css[i].href, location.href).href;
+
+                        fetch(resUrl).then((response) => {
+                            return response.text();
+                        }).then((contents) => {
+                            let style = document.createElement('style');
+                            style.type = 'text/css';
+                            style.innerHTML = contents;
+
+                            css[i].parentNode.replaceChild(style, css[i]);
+                        });
+
+                    } catch (err) {
+                        continue;
+                    }
                 }
 
                 resolve();
@@ -104,34 +114,44 @@ const ssr = async (url) => {
         await page.evaluate(async ({ linkBase }) => {
             await new Promise(resolve => {
                 var links = document.querySelectorAll('a[href]');
-            
+
                 for (let i = 0; i < links.length; i++) {
-                    if (links[i].href.match(/^(?:https?|\/)/)) {
-                        links[i].href = `${linkBase}?url=${new URL(links[i].href, location.href).href}`;
+                    try {
+                        if (links[i].href.match(/^(?:https?|\/)/)) {
+                            links[i].href = `${linkBase}?url=${new URL(links[i].href, location.href).href}`;
+                        }
+
+                    } catch (err) {
+                        continue;
                     }
                 }
 
                 resolve();
             });
-    
+
         }, { linkBase });
 
         await page.evaluate(async () => {
             await new Promise(resolve => {
                 var images = document.querySelectorAll('img[src]');
-    
+
                 for (let i = 0; i < 8; i++) {
-                    let resUrl = new URL(images[i].src, location.href).href;
-    
-                    fetch(resUrl).then((response) => {
-                        return response.blob();
-                    }).then((blob) => {
-                        let reader = new FileReader();
-                        reader.readAsDataURL(blob);
-                        reader.onloadend = () => {
-                            images[i].src = reader.result;
-                        } 
-                    });
+                    try {
+                        let resUrl = new URL(images[i].src, location.href).href;
+
+                        fetch(resUrl).then((response) => {
+                            return response.blob();
+                        }).then((blob) => {
+                            let reader = new FileReader();
+                            reader.readAsDataURL(blob);
+                            reader.onloadend = () => {
+                                images[i].src = reader.result;
+                            }
+                        });
+
+                    } catch (err) {
+                        continue;
+                    }
                 }
 
                 resolve();
