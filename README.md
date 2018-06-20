@@ -7,8 +7,6 @@ Unblocker accesses websites using Heroku servers, then uses SSR and returns to u
 
 🌚 Partial navigation on blocked website
 
-🌚 Uses `window.open().document.write` to output final template. Make sure to allow pop-ups.
-
 ✨ Pretty UI
 
 ![Screenshot](http://i98.fastpic.ru/big/2017/1123/23/443ab7811dc7c0e71d882bc374509623.png)
