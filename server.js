@@ -1,8 +1,8 @@
 const express = require('express');
+const compression = require('compression');
 const path = require('path');
 const fs = require('fs');
 const helmet = require('helmet');
-const shrinkRay = require('shrink-ray-current');
 const puppeteer = require('puppeteer');
 
 if (process.env.NODE_ENV === 'production') {
@@ -176,7 +176,7 @@ const ssr = async (url) => {
 setTimeout(() => {
     const app = express();
     app.use(helmet());
-    app.use(shrinkRay());
+    app.use(compression());
     app.use('/static', express.static(path.join(__dirname, 'static')));
 
     app.get('/', async (req, res) => {
@@ -191,5 +191,5 @@ setTimeout(() => {
     });
 
     app.listen(PORT, callbackFn);
-    
+
 }, 2000);
