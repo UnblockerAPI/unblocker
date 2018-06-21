@@ -19,8 +19,8 @@
     "url": "https://github.com/limitedeternity/unblocker/issues"
   },
   "engines": {
-    "node": "9.8.0",
-    "npm": "5.7.1"
+    "node": "10.5.0",
+    "npm": "6.1.0"
   },
   "homepage": "https://unblocker-webapp.herokuapp.com",
   "dependencies": {
