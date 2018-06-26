@@ -4,6 +4,8 @@ const path = require('path');
 const fs = require('fs');
 const helmet = require('helmet');
 const puppeteer = require('puppeteer');
+require('events').EventEmitter.prototype._maxListeners = 50;
+
 
 if (process.env.NODE_ENV === 'production') {
     var PORT = '/tmp/nginx.socket';
