@@ -27,8 +27,10 @@
     "compression": "^1.7.2",
     "cross-env": "^5.2.0",
     "express": "^4.16.3",
+    "generic-pool": "^3.4.2",
     "helmet": "^3.12.1",
-    "pm2": "^2.10.4",
-    "puppeteer": "^1.5.0"
+    "pm2": "^3.0.0",
+    "puppeteer": "^1.5.0",
+    "request": "^2.87.0"
   }
 }

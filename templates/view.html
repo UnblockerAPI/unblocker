@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Unblocker</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta name="robots" content="index, nofollow" />
+		<meta name="googlebot" content="index, nofollow" />
+    <meta name="google" content="notranslate" />
+    <meta name="yandex" content="index, nofollow" />
+    <meta name="keywords" content="разблокировка, блокировка, РКН, роскомнадзор, впн, vpn" />
+    <meta name="description" content="Утилита для просмотра информации по ссылке в условиях блокировки." />
+    <meta name="author" content="limitedeternity" />
+    <link rel="shortcut icon" type=image/png href="/static/images/favicon.png" />
+    <style>
+      .fullscreen {
+        position: fixed;
+        border: none;
+        outline: none;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+    </style>
+    <script src="https://unpkg.com/when-dom-ready"></script>
+    <script>
+        var pdf = new URL(location.href).searchParams.get("pdf");
+        if (pdf) {
+          whenDomReady(() => document.querySelector("embed").src = pdf);
+        }
+    </script>
+  </head>
+  <body>
+    <embed src="about:blank" type="application/pdf" class="fullscreen">
+  </body>
+</html>

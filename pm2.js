@@ -39,9 +39,11 @@ pm2.connect((err) => {
     });
   });
 
-  process.on('SIGINT', () => {
+  ['SIGINT', 'SIGTERM'].forEach(signal => {
+    process.on(signal, () => {
       pm2.stop((err) => {
         process.exit(err ? 1 : 0);
       });
+    });
   });
 });

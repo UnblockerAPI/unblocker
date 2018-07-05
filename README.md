@@ -1,7 +1,7 @@
 # Unblocker
 > Read-only access to websites.
 
-Unblocker accesses websites using Heroku servers, then uses SSR and returns to user.
+Unblocker renders website as interactive PDF file and returns it to user.
 
 # Features
 
@@ -10,6 +10,12 @@ Unblocker accesses websites using Heroku servers, then uses SSR and returns to u
 ✨ Pretty UI
 
 ![Screenshot](http://i98.fastpic.ru/big/2017/1123/23/443ab7811dc7c0e71d882bc374509623.png)
+
+# Info
+
+* Website converter can be used by sending a GET-request to `https://unblocker-webapp.herokuapp.com?url=[your_url_here]`
+
+* Online PDF viewer is located at `https://unblocker-webapp.herokuapp.com?view=[url_to_pdf]`
 
 ## Deployed at:
 
