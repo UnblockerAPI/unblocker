@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const helmet = require('helmet');
 const request = require('request');
-const createPuppeteerPool = require('./modules/pool');
+const initPuppeteerPool = require('./modules/pool');
 
 
 if (process.env.NODE_ENV === 'production') {
@@ -24,7 +24,7 @@ if (process.env.NODE_ENV === 'production') {
     };
 }
 
-const pool = createPuppeteerPool({
+const pool = initPuppeteerPool({
     puppeteerArgs: {
         userDataDir: path.join(__dirname, 'tmp'),
         args: [
