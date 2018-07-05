@@ -13,7 +13,7 @@ Unblocker renders website as interactive PDF file and returns it to user.
 
 # Info
 
-* Website converter can be used by sending a GET-request to `https://unblocker-webapp.herokuapp.com?url=[your_url_here]`
+* Website converter can be used by sending a GET-request to `https://unblocker-webapp.herokuapp.com?url=[your_url_here]&shouldScroll=[true|false]`
 
 * Online PDF viewer is located at `https://unblocker-webapp.herokuapp.com?view=[url_to_pdf]`
 
