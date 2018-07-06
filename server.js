@@ -7,22 +7,18 @@ const helmet = require('helmet');
 const request = require('request');
 const initPuppeteerPool = require('./modules/pool');
 
+var isProduction = process.env.NODE_ENV === 'production';
+var PORT = isProduction ? '/tmp/nginx.socket' : 8080;
+var callbackFn = () => {
+  if (isProduction) {
+    fs.closeSync(fs.openSync('/tmp/app-initialized', 'w'));
+  }
 
-if (process.env.NODE_ENV === 'production') {
-    var PORT = '/tmp/nginx.socket';
-    var linkBase = "https://unblocker-webapp.herokuapp.com";
-    var callbackFn = () => {
-        fs.closeSync(fs.openSync('/tmp/app-initialized', 'w'));
-        console.log(`Listening on ${PORT}`);
-    };
+  console.log(`Listening on ${PORT}`);
+};
 
-} else {
-    var PORT = 8080;
-    var linkBase = `http://127.0.0.1:${PORT}`;
-    var callbackFn = () => {
-        console.log(`Listening on ${PORT}`);
-    };
-}
+var linkBase = isProduction ? 'https://unblocker-webapp.herokuapp.com' : `http://127.0.0.1:${PORT}`;
+var RENDER_CACHE = require('./modules/cacheEngine')(isProduction);
 
 const pool = initPuppeteerPool({
     puppeteerArgs: {
@@ -34,8 +30,6 @@ const pool = initPuppeteerPool({
         headless: true
     }
 });
-
-const RENDER_CACHE = new Map();
 
 const render = async ({ url, shouldScroll }) => {
     return new Promise((result, reject) => {
@@ -123,25 +117,33 @@ app.use('/static', express.static(path.join(__dirname, 'static')));
 
 app.get('/', async (req, res) => {
     if (req.query.url && /http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+/.test(req.query.url)) {
-        if (RENDER_CACHE.has(req.query.url)) {
-            let { entryStillExists } = await new Promise(resolve => {
+        let keyExists = await RENDER_CACHE.hasKey(req.query.url);
+
+        if (keyExists) {
+            let { entryStillValid, entry } = await new Promise(async resolve => {
+                let entry = await RENDER_CACHE.getKey(req.query.url);
+
+                if (!entry) {
+                  RENDER_CACHE.deleteKey(req.query.url);
+                  return resolve({ entryStillValid: false, entry: null });
+                }
+
                 request({
                     method: 'HEAD',
-                    uri: RENDER_CACHE.get(req.query.url)
+                    uri: entry
                 },
                 (err, httpResponse, body) => {
                     if (err || httpResponse.statusCode !== 200) {
-                        RENDER_CACHE.delete(req.query.url);
-
-                        return resolve({ entryStillExists: false });
+                        RENDER_CACHE.deleteKey(req.query.url);
+                        return resolve({ entryStillValid: false, entry: null });
                     }
 
-                    return resolve({ entryStillExists: true });
+                    return resolve({ entryStillValid: true, entry: entry });
                 });
             });
 
-            if (entryStillExists) {
-                return res.redirect(`/view?pdf=${RENDER_CACHE.get(req.query.url)}`);
+            if (entryStillValid) {
+                return res.redirect(`/view?pdf=${entry}`);
             }
         }
 
@@ -180,7 +182,7 @@ app.get('/', async (req, res) => {
                 fs.unlinkSync(pdfDestination);
 
                 let uploadUrl = uploadResult.files[0].url;
-                RENDER_CACHE.set(req.query.url, uploadUrl);
+                RENDER_CACHE.setKey(req.query.url, uploadUrl);
 
                 return res.redirect(`/view?pdf=${uploadUrl}`);
 
