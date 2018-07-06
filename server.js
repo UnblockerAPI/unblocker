@@ -10,11 +10,11 @@ const initPuppeteerPool = require('./modules/pool');
 var isProduction = process.env.NODE_ENV === 'production';
 var PORT = isProduction ? '/tmp/nginx.socket' : 8080;
 var callbackFn = () => {
-  if (isProduction) {
-    fs.closeSync(fs.openSync('/tmp/app-initialized', 'w'));
-  }
+    if (isProduction) {
+        fs.closeSync(fs.openSync('/tmp/app-initialized', 'w'));
+    }
 
-  console.log(`Listening on ${PORT}`);
+    console.log(`Listening on ${PORT}`);
 };
 
 var linkBase = isProduction ? 'https://unblocker-webapp.herokuapp.com' : `http://127.0.0.1:${PORT}`;
@@ -23,11 +23,14 @@ var RENDER_CACHE = require('./modules/cacheEngine')(isProduction);
 const pool = initPuppeteerPool({
     puppeteerArgs: {
         userDataDir: path.join(__dirname, 'tmp'),
+        ignoreHTTPSErrors: true,
+        headless: true,
         args: [
             '--no-sandbox',
-            '--disable-setuid-sandbox'
-        ],
-        headless: true
+            '--disable-setuid-sandbox',
+            '--mute-audio',
+            '--hide-scrollbars'
+        ]
     }
 });
 
