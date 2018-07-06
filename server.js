@@ -114,6 +114,7 @@ const render = async ({ url, shouldScroll }) => {
 };
 
 const app = express();
+app.enable("trust proxy");
 app.use(helmet());
 app.use(compression());
 app.use('/static', express.static(path.join(__dirname, 'static')));
