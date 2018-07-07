@@ -78,9 +78,7 @@ const render = async ({ url, shouldScroll }) => {
 
                         for (let i = 0; i < links.length; i++) {
                             try {
-                                if (/^(?:http[s]?|\/)/.test(links[i].href)) {
-                                    links[i].href = `${linkBase}?url=${new URL(links[i].href, location.href).href}`;
-                                }
+                                links[i].href = `${linkBase}?url=${new URL(links[i].href, location.href).href}`;
 
                             } catch (err) {
                                 continue;
@@ -132,22 +130,23 @@ const render = async ({ url, shouldScroll }) => {
 };
 
 const app = express();
-app.enable("trust proxy");
+app.enable("trust proxy", 1);
 app.use(helmet());
 app.use(compression());
 app.use('/static', express.static(path.join(__dirname, 'static')));
 
 app.get('/', async (req, res) => {
-    if (req.query.url && /http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+/.test(req.query.url)) {
-        let keyExists = await RENDER_CACHE.hasKey(req.query.url);
+    try {
+        let targetUrl = new URL(req.query.url);
+        let keyExists = await RENDER_CACHE.hasKey(targetUrl.href);
 
         if (keyExists) {
             let { entryStillValid, entry } = await new Promise(async resolve => {
-                let entry = await RENDER_CACHE.getKey(req.query.url);
+                let entry = await RENDER_CACHE.getKey(targetUrl.href);
 
                 if (!entry) {
-                  RENDER_CACHE.deleteKey(req.query.url);
-                  return resolve({ entryStillValid: false, entry: null });
+                    RENDER_CACHE.deleteKey(targetUrl.href);
+                    return resolve({ entryStillValid: false, entry: null });
                 }
 
                 request({
@@ -156,7 +155,7 @@ app.get('/', async (req, res) => {
                 },
                 (err, httpResponse, body) => {
                     if (err || httpResponse.statusCode !== 200) {
-                        RENDER_CACHE.deleteKey(req.query.url);
+                        RENDER_CACHE.deleteKey(targetUrl.href);
                         return resolve({ entryStillValid: false, entry: null });
                     }
 
@@ -170,7 +169,7 @@ app.get('/', async (req, res) => {
         }
 
         let shouldScroll = (req.query.shouldScroll && /^true$/.test(req.query.shouldScroll));
-        let { pdfDestination } = await render({ url: req.query.url, shouldScroll: shouldScroll });
+        let { pdfDestination } = await render({ url: targetUrl.href, shouldScroll: shouldScroll });
 
         if (pdfDestination) {
             let formPayload = {
@@ -204,7 +203,7 @@ app.get('/', async (req, res) => {
                 fs.unlinkSync(pdfDestination);
 
                 let uploadUrl = uploadResult.files[0].url;
-                RENDER_CACHE.setKey(req.query.url, uploadUrl);
+                RENDER_CACHE.setKey(targetUrl.href, uploadUrl);
 
                 return res.redirect(`/view?pdf=${uploadUrl}`);
 
@@ -219,19 +218,22 @@ app.get('/', async (req, res) => {
             res.set('Content-Type', 'text/html');
             return res.send(Buffer.from("<h1>Failed to load page.</h1>"));
         }
-    }
 
-    return res.sendFile(path.join(__dirname, 'templates', 'index.html'));
+    } catch (err) {
+        return res.sendFile(path.join(__dirname, 'templates', 'index.html'));
+    }
 });
 
 app.get('/view', (req, res) => {
-    if (req.query.pdf && /http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+/.test(req.query.pdf)) {
+    try {
+        let targetPdf = new URL(req.query.pdf);
         return res.sendFile(path.join(__dirname, 'templates', 'view.html'));
-    }
 
-    res.status(400);
-    res.set('Content-Type', 'text/html');
-    res.send(Buffer.from("<h1>You shall not pass!!1</h1>"));
+    } catch (err) {
+        res.status(400);
+        res.set('Content-Type', 'text/html');
+        res.send(Buffer.from("<h1>You shall not pass!!1</h1>"));
+    }
 });
 
 app.listen(PORT, callbackFn);

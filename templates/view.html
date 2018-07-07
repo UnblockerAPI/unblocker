@@ -34,22 +34,29 @@
             var isInIframe = (parent !== window);
 
             if (isInIframe) {
-                var pdf = new URL(document.referrer).searchParams.get("pdf");
-                var fallbackUrl = new URL(document.referrer).searchParams.get("url");
+                var pdfQuery = new URL(document.referrer).searchParams.get("pdf");
+                var fallbackUrlQuery = new URL(document.referrer).searchParams.get("url");
 
             } else {
-                var pdf = new URL(location.href).searchParams.get("pdf");
+                var pdfQuery = new URL(location.href).searchParams.get("pdf");
             }
 
-            if (pdf) {
-                return whenDomReady(() => document.querySelector("embed").src = pdf);
+            try {
+                var pdfObject = new URL(pdfQuery);
+                if (/\.pdf$/.test(pdfObject.href)) {
+                    return whenDomReady(() => document.querySelector("embed").src = pdfObject.href + "#zoom=150");
+                }
+
+            } catch (err) {
+                console.log("PDF query is not detected or invalid.");
             }
 
-            if (fallbackUrl) {
-                parent.location.href = fallbackUrl;
+            try {
+                var fallbackUrlObject = new URL(fallbackUrlQuery);
+                parent.location.href = fallbackUrlObject.href;
 
-            } else {
-                document.querySelector("body").innerHTML = "<h1>I'm down. Sorry for that. I'll restart in a few minutes, I promise.</h1>";
+            } catch (err) {
+                return whenDomReady(() => document.querySelector("body").innerHTML = "<h1>Error.</h1>");
             }
         })();
     </script>

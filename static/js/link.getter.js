@@ -6,14 +6,18 @@ $(document).ready(function() {
 
         function objectifyForm(formArray) {
             var returnArray = {};
-            for (var i = 0; i < formArray.length; i++){
+            for (let i = 0; i < formArray.length; i++) {
                 returnArray[formArray[i]['name']] = formArray[i]['value'];
             }
             return returnArray;
         }
 
         var serializedData = objectifyForm(inputData);
-        if (!serializedData.url || !serializedData.url.match(/http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+/)) {
+
+        try {
+            var targetUrl = new URL(serializedData.url);
+
+        } catch (err) {
             $("#output").html("<input type='text' value='URL invalid' name='link_out' autocomplete='off' />");
             return;
         }
@@ -22,7 +26,7 @@ $(document).ready(function() {
         $("#submit").hide();
 
         var currentUrl = new URL(location.href);
-        currentUrl.searchParams.set('url', serializedData.url);
+        currentUrl.searchParams.set('url', targetUrl.href);
         location.href = currentUrl.href;
     });
 });
