@@ -25,9 +25,12 @@ const pool = initPuppeteerPool({
         userDataDir: path.join(__dirname, 'tmp'),
         ignoreHTTPSErrors: true,
         headless: true,
+        slowMo: 0,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
+            '--disable-gpu',
+            '--disable-dev-shm-usage',
             '--mute-audio',
             '--hide-scrollbars'
         ]
@@ -39,19 +42,34 @@ const render = async ({ url, shouldScroll }) => {
         pool.use(async browser => {
             var page = await browser.newPage();
 
-            page.on('dialog', async dialog => await dialog.dismiss());
-            page.setDefaultNavigationTimeout(15000);
-
-            await page.setViewport({
-                width: 1280,
-                height: 720
-            });
+            await page.setDefaultNavigationTimeout(10000);
+            await page.setRequestInterception(true);
             await page.emulateMedia('screen');
+            await page.setViewport({ width: 1280, height: 720 });
+
+            page.on('dialog', async dialog => await dialog.dismiss());
+
+            page.on('error', () => {
+                page.close();
+                return result({ pdfDestination: null });
+            });
+
+            page.on('request', request => {
+                request.continue();
+            });
+
+            page.on('domcontentloaded', async () => {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                page.removeListener('request', () => {
+                    page.on('request', request => {
+                        request.abort();
+                    });
+                });
+            });
 
             try {
                 await page.goto(url, {
-                    waitUntil: 'networkidle0',
-                    timeout: 60000
+                    waitUntil: 'domcontentloaded'
                 });
 
                 await page.evaluate(async ({ linkBase }) => {
@@ -103,10 +121,10 @@ const render = async ({ url, shouldScroll }) => {
                 });
 
                 page.close();
-
                 return result({ pdfDestination: output });
 
             } catch (err) {
+                page.close();
                 return result({ pdfDestination: null });
             }
         });
