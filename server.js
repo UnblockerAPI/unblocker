@@ -225,15 +225,13 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/view', (req, res) => {
-    try {
-        let targetPdf = new URL(req.query.pdf);
+    if (req.query.pdf) {
         return res.sendFile(path.join(__dirname, 'templates', 'view.html'));
-
-    } catch (err) {
-        res.status(400);
-        res.set('Content-Type', 'text/html');
-        res.send(Buffer.from("<h1>You shall not pass!!1</h1>"));
     }
+
+    res.status(400);
+    res.set('Content-Type', 'text/html');
+    return res.send(Buffer.from("<h1>You shall not pass!!1</h1>"));
 });
 
 app.listen(PORT, callbackFn);
