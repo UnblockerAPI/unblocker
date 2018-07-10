@@ -25,8 +25,8 @@ module.exports = async ({ url, linkBase, shouldScroll }) => {
             var page = await browser.newPage();
 
             await page.setDefaultNavigationTimeout(10000);
-            await page.setRequestInterception(true);
             await page._client.send('Page.setDownloadBehavior', { behavior: 'deny' });
+            await page._client.send('Page.setAdBlockingEnabled', { enabled: true });
             await page.emulateMedia('screen');
             await page.setViewport({ width: 1280, height: 720 });
 
@@ -35,19 +35,6 @@ module.exports = async ({ url, linkBase, shouldScroll }) => {
             page.on('error', () => {
                 page.close();
                 return result({ pdfDestination: null });
-            });
-
-            page.on('request', request => {
-                request.continue();
-            });
-
-            page.on('domcontentloaded', async () => {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                page.removeListener('request', () => {
-                    page.on('request', request => {
-                        request.abort();
-                    });
-                });
             });
 
             try {
