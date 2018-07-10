@@ -1,13 +1,12 @@
 const express = require('express');
 const compression = require('compression');
 const path = require('path');
-const crypto = require('crypto');
 const fs = require('fs');
 const helmet = require('helmet');
 const request = require('request');
-const initPuppeteerPool = require('./modules/pool');
 
 var isProduction = process.env.NODE_ENV === 'production';
+var linkBase = isProduction ? 'https://unblocker-webapp.herokuapp.com' : `http://127.0.0.1:${PORT}`;
 var PORT = isProduction ? '/tmp/nginx.socket' : 8080;
 var callbackFn = () => {
     if (isProduction) {
@@ -17,123 +16,14 @@ var callbackFn = () => {
     console.log(`Listening on ${PORT}`);
 };
 
-var linkBase = isProduction ? 'https://unblocker-webapp.herokuapp.com' : `http://127.0.0.1:${PORT}`;
-var RENDER_CACHE = require('./modules/cacheEngine')(isProduction);
-
-const pool = initPuppeteerPool({
-    puppeteerArgs: {
-        userDataDir: path.join(__dirname, 'tmp'),
-        ignoreHTTPSErrors: true,
-        headless: true,
-        slowMo: 0,
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-gpu',
-            '--disable-dev-shm-usage',
-            '--mute-audio',
-            '--hide-scrollbars'
-        ]
-    }
-});
-
-const render = async ({ url, shouldScroll }) => {
-    return new Promise((result, reject) => {
-        pool.use(async browser => {
-            var page = await browser.newPage();
-
-            await page.setDefaultNavigationTimeout(10000);
-            await page.setRequestInterception(true);
-            await page.emulateMedia('screen');
-            await page.setViewport({ width: 1280, height: 720 });
-
-            page.on('dialog', async dialog => await dialog.dismiss());
-
-            page.on('error', () => {
-                page.close();
-                return result({ pdfDestination: null });
-            });
-
-            page.on('request', request => {
-                request.continue();
-            });
-
-            page.on('domcontentloaded', async () => {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                page.removeListener('request', () => {
-                    page.on('request', request => {
-                        request.abort();
-                    });
-                });
-            });
-
-            try {
-                await page.goto(url, {
-                    waitUntil: 'domcontentloaded'
-                });
-
-                await page.evaluate(async ({ linkBase }) => {
-                    await new Promise(resolve => {
-                        var links = document.querySelectorAll('a[href]');
-
-                        for (let i = 0; i < links.length; i++) {
-                            try {
-                                links[i].href = `${linkBase}?url=${new URL(links[i].href, location.href).href}`;
-
-                            } catch (err) {
-                                continue;
-                            }
-                        }
-
-                        return resolve(true);
-                    });
-
-                }, { linkBase });
-
-                if (shouldScroll) {
-                    await page.evaluate(async () => {
-                        await new Promise(resolve => {
-                            var offset = -100;
-                            var pageScroll = () => {
-                                window.scrollBy(0, 50);
-
-                                if (window.pageYOffset === offset) {
-                                    return resolve(true);
-                                }
-
-                                offset = window.pageYOffset;
-                                scrolldelay = setTimeout(pageScroll, 50);
-                            };
-
-                            pageScroll();
-                        });
-                    });
-                }
-
-                var output = path.join(__dirname, 'tmp', crypto.randomBytes(20).toString('hex') + '.pdf');
-
-                await page.pdf({
-                    path: output,
-                    format: 'A4',
-                    printBackground: true
-                });
-
-                page.close();
-                return result({ pdfDestination: output });
-
-            } catch (err) {
-                page.close();
-                return result({ pdfDestination: null });
-            }
-        });
-    });
-};
+const RENDER_CACHE = require('./modules/cacheEngine')(isProduction);
+const render = require('./modules/render');
 
 const app = express();
 app.enable("trust proxy", 1);
 app.use(helmet());
 app.use(compression());
-app.use('/static', express.static(path.join(__dirname, 'static')));
+app.use('/static', express.static(path.join(process.cwd(), 'static')));
 
 app.get('/', async (req, res) => {
     try {
@@ -168,8 +58,46 @@ app.get('/', async (req, res) => {
             }
         }
 
+        let { isOk, headers } = await new Promise(resolve => {
+            request({
+                method: 'HEAD',
+                uri: targetUrl.href
+            },
+            (err, httpResponse, body) => {
+                if (err || httpResponse.statusCode !== 200) {
+                    return resolve({ isOk: false, headers: null });
+                }
+
+                return resolve({ isOk: true, headers: httpResponse.headers });
+            });
+        });
+
+        if (!isOk) {
+            res.set('Content-Type', 'text/html');
+            return res.send(Buffer.from("<h1>Server returned non-200 status code.</h1>"));
+        }
+
+        let contentTypeHeaderExists = headers.hasOwnProperty('content-type');
+        let contentLengthHeaderExists = headers.hasOwnProperty('content-length');
+
+        if (contentTypeHeaderExists && contentLengthHeaderExists) {
+            let contentType = headers["content-type"];
+            let contentLength = headers["content-length"];
+
+            if (contentType !== "text/html") {
+                res.status(200);
+                res.set({
+                    'Content-Type': contentType,
+                    'Content-Length': contentLength,
+                    'Content-Disposition': 'attachment'
+                });
+
+                return request({ method: 'GET', uri: targetUrl.href }).pipe(res);
+            }
+        }
+
         let shouldScroll = (req.query.shouldScroll && /^true$/.test(req.query.shouldScroll));
-        let { pdfDestination } = await render({ url: targetUrl.href, shouldScroll: shouldScroll });
+        let { pdfDestination } = await render({ url: targetUrl.href, linkBase: linkBase, shouldScroll: shouldScroll });
 
         if (pdfDestination) {
             let formPayload = {
@@ -220,13 +148,13 @@ app.get('/', async (req, res) => {
         }
 
     } catch (err) {
-        return res.sendFile(path.join(__dirname, 'templates', 'index.html'));
+        return res.sendFile(path.join(process.cwd(), 'templates', 'index.html'));
     }
 });
 
 app.get('/view', (req, res) => {
     if (req.query.pdf) {
-        return res.sendFile(path.join(__dirname, 'templates', 'view.html'));
+        return res.sendFile(path.join(process.cwd(), 'templates', 'view.html'));
     }
 
     res.status(400);
