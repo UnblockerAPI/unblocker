@@ -25,11 +25,13 @@ $(document).ready(function() {
         $("#output").html('<div class="span"><div class="typing_loader"></div></div>');
         $("#submit").hide();
 
-        setTimeout(function() {
-            $("#submit").show();
-            $("#output").html('');
-        },
-        15000);
+        setTimeout(
+            function() {
+                $("#submit").show();
+                $("#output").html('');
+            },
+            15000
+        );
 
         var currentUrl = new URL(location.href);
         currentUrl.searchParams.set('url', targetUrl.href);

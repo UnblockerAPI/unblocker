@@ -26,6 +26,7 @@ module.exports = async ({ url, linkBase, shouldScroll }) => {
 
             await page.setDefaultNavigationTimeout(10000);
             await page.setRequestInterception(true);
+            await page._client.send('Page.setDownloadBehavior', { behavior: 'deny' });
             await page.emulateMedia('screen');
             await page.setViewport({ width: 1280, height: 720 });
 
