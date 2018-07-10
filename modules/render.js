@@ -104,6 +104,7 @@ module.exports = async ({ url, linkBase, shouldScroll }) => {
                 return result({ pdfDestination: output });
 
             } catch (err) {
+                console.log(err);
                 page.close();
                 return result({ pdfDestination: null });
             }
