@@ -1,21 +1,17 @@
 # Unblocker
-> Read-only access to websites.
+> Makes region-restricted websites accessible
 
-Unblocker renders website as interactive PDF file and returns it to user.
+Unblocker accesses region-restricted content by URL.
 
 # Features
 
-🌚 Partial navigation on blocked website
+✨ Renders websites as fully-interactive PDF files (even with navigation)
 
-✨ Pretty UI
+✨ If input URL points to some file (not a webpage), streams it to user
+
+🌚 Has a pretty UI
 
 ![Screenshot](http://i98.fastpic.ru/big/2017/1123/23/443ab7811dc7c0e71d882bc374509623.png)
-
-# Info
-
-* Website converter can be used by sending a GET-request to `https://unblocker-webapp.herokuapp.com?url=[your_url_here]&shouldScroll=[true|false]`
-
-* Online PDF viewer is located at `https://unblocker-webapp.herokuapp.com/view?pdf=[url_to_pdf]`
 
 ## Deployed at:
 
