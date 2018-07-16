@@ -13,6 +13,8 @@ const pool = initPuppeteerPool({
             '--disable-setuid-sandbox',
             '--disable-gpu',
             '--disable-dev-shm-usage',
+            '--proxy-server="direct://"',
+            '--proxy-bypass-list=*',
             '--mute-audio',
             '--hide-scrollbars'
         ]
