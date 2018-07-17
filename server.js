@@ -4,6 +4,10 @@ const path = require('path');
 const fs = require('fs');
 const helmet = require('helmet');
 const request = require('request');
+const WebTorrent = require('webtorrent');
+const mime = require('mime-types');
+require('events').EventEmitter.prototype._maxListeners = Infinity;
+
 
 var isProduction = process.env.NODE_ENV === 'production';
 var linkBase = isProduction ? 'https://unblocker-webapp.herokuapp.com' : `http://127.0.0.1:${PORT}`;
@@ -16,8 +20,10 @@ var callbackFn = () => {
     console.log(`Listening on ${PORT}`);
 };
 
+
 const RENDER_CACHE = require('./modules/cacheEngine')(isProduction);
 const render = require('./modules/render');
+
 
 const app = express();
 app.enable("trust proxy", 1);
@@ -28,6 +34,45 @@ app.use('/static', express.static(path.join(process.cwd(), 'static')));
 app.get('/', async (req, res) => {
     try {
         let targetUrl = new URL(req.query.url);
+
+        if (/magnet:\?xt=urn:[a-z0-9]+:[a-zA-Z0-9]*/.test(targetUrl.href)) {
+            let torrentClient = new WebTorrent();
+
+            let { error, torrentFile } = await new Promise(resolve => {
+                torrentClient.on('error', () => {
+                    resolve({ error: true, torrentFile: null });
+                });
+
+                torrentClient.on('torrent', torrentObject => {
+                    torrentClient.destroy();
+                    resolve({ error: false, torrentFile: torrentObject.torrentFile });
+                });
+
+                torrentClient.add(targetUrl.href);
+            });
+
+            if (error) {
+                let responseHTML = Buffer.from("<h1>Failed to convert magnet link.</h1>");
+
+                res.status(200);
+                res.set({
+                    'Content-Type': 'text/html',
+                    'Content-Length': Buffer.byteLength(responseHTML)
+                });
+
+                return res.send(responseHTML);
+            }
+
+            res.status(200);
+            res.set({
+                'Content-Type': 'application/x-bittorrent',
+                'Content-Length': Buffer.byteLength(torrentFile),
+                'Content-Disposition': `attachment; filename="${'download.' + mime.extension('application/x-bittorrent')}"`
+            });
+
+            return res.send(torrentFile);
+        }
+
         let keyExists = await RENDER_CACHE.hasKey(targetUrl.href);
 
         if (keyExists) {
@@ -73,8 +118,15 @@ app.get('/', async (req, res) => {
         });
 
         if (!isOk) {
-            res.set('Content-Type', 'text/html');
-            return res.send(Buffer.from("<h1>Server returned non-200 status code.</h1>"));
+            let responseHTML = Buffer.from("<h1>Server returned non-200 status code.</h1>");
+
+            res.status(200);
+            res.set({
+                'Content-Type': 'text/html',
+                'Content-Length': Buffer.byteLength(responseHTML)
+            });
+
+            return res.send(responseHTML);
         }
 
         let contentTypeHeaderExists = headers.hasOwnProperty('content-type');
@@ -89,7 +141,7 @@ app.get('/', async (req, res) => {
                 res.set({
                     'Content-Type': contentType,
                     'Content-Length': contentLength,
-                    'Content-Disposition': 'attachment'
+                    'Content-Disposition': `attachment; filename=${'download.' + mime.extension(contentType)}`
                 });
 
                 return request({ method: 'GET', uri: targetUrl.href }).pipe(res);
@@ -138,13 +190,27 @@ app.get('/', async (req, res) => {
             } else {
                 fs.unlinkSync(pdfDestination);
 
-                res.set('Content-Type', 'text/html');
-                return res.send(Buffer.from("<h1>Failed to upload result.</h1>"));
+                let responseHTML = Buffer.from("<h1>Failed to upload result.</h1>");
+
+                res.status(200);
+                res.set({
+                    'Content-Type': 'text/html',
+                    'Content-Length': Buffer.byteLength(responseHTML)
+                });
+
+                return res.send(responseHTML);
             }
 
         } else {
-            res.set('Content-Type', 'text/html');
-            return res.send(Buffer.from("<h1>Failed to load page.</h1>"));
+            let responseHTML = Buffer.from("<h1>Failed to load page.</h1>");
+
+            res.status(200);
+            res.set({
+                'Content-Type': 'text/html',
+                'Content-Length': Buffer.byteLength(responseHTML)
+            });
+
+            return res.send(responseHTML);
         }
 
     } catch (err) {
@@ -157,9 +223,15 @@ app.get('/view', (req, res) => {
         return res.sendFile(path.join(process.cwd(), 'templates', 'view.html'));
     }
 
-    res.status(400);
-    res.set('Content-Type', 'text/html');
-    return res.send(Buffer.from("<h1>You shall not pass!!1</h1>"));
+    let responseHTML = Buffer.from("<h1>You shall not pass!!1</h1>");
+
+    res.status(200);
+    res.set({
+        'Content-Type': 'text/html',
+        'Content-Length': Buffer.byteLength(responseHTML)
+    });
+
+    return res.send(responseHTML);
 });
 
 app.listen(PORT, callbackFn);
