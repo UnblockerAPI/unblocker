@@ -1,5 +1,6 @@
 const express = require('express');
 const compression = require('compression');
+const fs = require('fs');
 const path = require('path');
 const helmet = require('helmet');
 
