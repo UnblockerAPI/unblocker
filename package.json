@@ -27,13 +27,8 @@
     "compression": "^1.7.3",
     "cross-env": "^5.2.0",
     "express": "^4.16.3",
-    "generic-pool": "^3.4.2",
     "helmet": "^3.12.1",
-    "mime-types": "^2.1.18",
     "pm2": "^3.0.0",
-    "puppeteer": "^1.6.0",
-    "redis": "^2.8.0",
-    "request": "^2.87.0",
-    "webtorrent": "^0.100.0"
+    "request": "^2.87.0"
   }
 }
