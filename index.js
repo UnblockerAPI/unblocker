@@ -32,7 +32,7 @@ app.get('/', async (req, res) => {
 
     try {
         if (/magnet:\?xt=urn:[a-z0-9]+:[a-zA-Z0-9]*/.test(req.query.url)) {
-            return res.redirect(`https://magnet-api.herokuapp.com/?magnet=${req.query.url}`);
+            return res.redirect(`https://magnet-api.herokuapp.com/?url=${req.query.url}`);
         }
 
         let targetUrl = new URL(req.query.url);
