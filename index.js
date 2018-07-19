@@ -1,49 +1,67 @@
-const pm2 = require('pm2');
+const express = require('express');
+const compression = require('compression');
+const fs = require('fs');
+const path = require('path');
+const helmet = require('helmet');
 
-var instances = process.env.WEB_CONCURRENCY || -1;
-var maxMemory = process.env.WEB_MEMORY || 512;
-var options = {
-  name: 'server',
-  script: 'server.js',
-  exec_mode: 'cluster',
-  instances: instances,
-  max_restarts: Infinity,
-  min_uptime: 300,
-  node_args: ["--optimize_for_size", "--max_old_space_size=460", "--gc_interval=100"],
-  max_memory_restart: `${maxMemory}M`,
-};
 
-pm2.connect((err) => {
-  if (err) {
-    console.error(err);
-    process.exit(2);
-  }
-
-  pm2.start(options, (err) => {
-    if (err) {
-      return console.error('Error while launching applications', err.stack || err);
+let isProduction = process.env.NODE_ENV === 'production';
+let PORT = isProduction ? '/tmp/nginx.socket' : 8080;
+let callbackFn = () => {
+    if (isProduction) {
+        fs.closeSync(fs.openSync('/tmp/app-initialized', 'w'));
     }
 
-    console.log(`[PM2] Started ${instances} instances of ${options.script}. Memory limit: ${maxMemory}`)
+    console.log(`Listening on ${PORT}`);
+};
 
-    pm2.launchBus((err, bus) => {
-      console.log('[PM2] Log streaming started\n');
 
-      bus.on('log:out', (packet) => {
-        console.log('[App:%s] %s', packet.process.name, packet.data);
-      });
+const utils = require('./modules/utils');
 
-      bus.on('log:err', (packet) => {
-        console.error('[App:%s][ERR] %s', packet.process.name, packet.data);
-      });
-    });
-  });
 
-  ['SIGINT', 'SIGTERM'].forEach(signal => {
-    process.on(signal, () => {
-      pm2.stop((err) => {
-        process.exit(err ? 1 : 0);
-      });
-    });
-  });
+const app = express();
+app.enable("trust proxy", 1);
+app.use(helmet());
+app.use(compression());
+app.use('/static', express.static(path.join(process.cwd(), 'static')));
+
+app.get('/', async (req, res) => {
+    if (!req.query.url) {
+        return res.status(200).sendFile(path.join(process.cwd(), 'templates', 'index.html'));
+    }
+
+    try {
+        if (/magnet:\?xt=urn:[a-z0-9]+:[a-zA-Z0-9]*/.test(req.query.url)) {
+            return res.redirect(`https://magnet-api.herokuapp.com/?magnet=${req.query.url}`);
+        }
+
+        let targetUrl = new URL(req.query.url);
+
+        let { isOk, headers } = await utils.checkAvailability({ url: targetUrl.href });
+
+        if (!isOk) {
+            return res.status(400).json({ success: false, reason: "Non200StatusCode" });
+        }
+
+        let contentTypeHeaderExists = headers.hasOwnProperty('content-type');
+
+        if (contentTypeHeaderExists) {
+            let contentType = headers["content-type"];
+
+            if (contentType.includes("text/html")) {
+                return res.redirect(`https://pdf-render-api.herokuapp.com/?url=${targetUrl.href}&display=true`);
+
+            } else {
+                return res.redirect(`https://download-stream-api.herokuapp.com/?url=${targetUrl.href}`);
+            }
+
+        } else {
+            return res.status(400).json({ success: false, reason: "NoValidHeaders" });
+        }
+
+    } catch (e) {
+        return res.status(400).json({ success: false, reason: "InvalidURL" });
+    }
 });
+
+app.listen(PORT, callbackFn);
