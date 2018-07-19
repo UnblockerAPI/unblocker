@@ -48,7 +48,7 @@ app.get('/', async (req, res) => {
         if (contentTypeHeaderExists) {
             let contentType = headers["content-type"];
 
-            if (contentType === "text/html") {
+            if (contentType.includes("text/html")) {
                 return res.redirect(`https://pdf-render-api.herokuapp.com/?url=${targetUrl.href}&display=true`);
 
             } else {
