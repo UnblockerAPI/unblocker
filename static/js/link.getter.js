@@ -15,10 +15,19 @@ $(document).ready(function() {
         var serializedData = objectifyForm(inputData);
 
         try {
-            var targetUrl = new URL(serializedData.url);
+            if (/magnet:\?xt=urn:[a-z0-9]+:[a-zA-Z0-9]*/.test(serializedData.url)) {
+                var targetUrl = {
+                    get href() {
+                        return serializedData.url;
+                    }
+                }
+
+            } else {
+                var targetUrl = new URL(serializedData.url);
+            }
 
         } catch (err) {
-            $("#output").html("<input type='text' value='URL invalid' name='link_out' autocomplete='off' />");
+            $("#output").html("<input type='text' value='Invalid URL' name='link_out' autocomplete='off' />");
             return;
         }
 
@@ -45,4 +54,4 @@ $(window).load(function() {
     });
 });
 
-HTMLDocument.prototype.__defineGetter__("write",function(){return null});
+HTMLDocument.prototype.__defineGetter__("write", function() { return null });
