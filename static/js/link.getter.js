@@ -43,7 +43,7 @@ $(document).ready(function() {
         );
 
         var currentUrl = new URL(location.href);
-        currentUrl.searchParams.set('url', targetUrl.href);
+        currentUrl.searchParams.set('url', btoa(targetUrl.href));
         location.href = currentUrl.href;
     });
 });

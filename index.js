@@ -31,11 +31,13 @@ app.get('/', async (req, res) => {
     }
 
     try {
-        if (/magnet:\?xt=urn:[a-z0-9]+:[a-zA-Z0-9]*/.test(req.query.url)) {
-            return res.redirect(`https://magnet-api.herokuapp.com/?url=${req.query.url}`);
+        let decodedUrl = Buffer.from(req.query.url, 'base64').toString('ascii');
+
+        if (/magnet:\?xt=urn:[a-z0-9]+:[a-zA-Z0-9]*/.test(decodedUrl)) {
+            return res.redirect(`https://magnet-api.herokuapp.com/?url=${Buffer.from(decodedUrl).toString('base64')}`);
         }
 
-        let targetUrl = new URL(req.query.url);
+        let targetUrl = new URL(decodedUrl);
 
         let { isOk, headers } = await utils.checkAvailability({ url: targetUrl.href });
 
@@ -49,10 +51,10 @@ app.get('/', async (req, res) => {
             let contentType = headers["content-type"];
 
             if (contentType.includes("text/html")) {
-                return res.redirect(`https://pdf-render-api.herokuapp.com/?url=${targetUrl.href}&display=true`);
+                return res.redirect(`https://pdf-render-api.herokuapp.com/?url=${Buffer.from(targetUrl.href).toString('base64')}&display=true`);
 
             } else {
-                return res.redirect(`https://download-stream-api.herokuapp.com/?url=${targetUrl.href}`);
+                return res.redirect(`https://download-stream-api.herokuapp.com/?url=${Buffer.from(targetUrl.href).toString('base64')}`);
             }
 
         } else {
