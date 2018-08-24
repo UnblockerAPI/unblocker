@@ -6,12 +6,8 @@ const helmet = require('helmet');
 
 
 let isProduction = process.env.NODE_ENV === 'production';
-let PORT = isProduction ? '/tmp/nginx.socket' : 8080;
+let PORT = 8080;
 let callbackFn = () => {
-    if (isProduction) {
-        fs.closeSync(fs.openSync('/tmp/app-initialized', 'w'));
-    }
-
     console.log(`Listening on ${PORT}`);
 };
 

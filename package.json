@@ -4,7 +4,7 @@
   "description": "Read-only access to websites.",
   "main": "server.js",
   "scripts": {
-    "start": "bin/start-nginx cross-env NODE_ENV=production node index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
     "dev": "node index.js",
     "postinstall": "npm ddp"
   },
