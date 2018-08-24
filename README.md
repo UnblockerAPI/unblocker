@@ -15,7 +15,7 @@ Unblocker accesses region-restricted content by URL.
 
 ## Deployed at:
 
-https://unblocker-webapp.herokuapp.com/
+https://unblocker.now.sh
 
 ## Meta
 
