@@ -15,7 +15,6 @@ const utils = require('./modules/utils');
 
 
 const app = express();
-app.enable("trust proxy", 1);
 app.use(helmet());
 app.use(compression());
 app.use('/static', express.static(path.join(process.cwd(), 'static')));
