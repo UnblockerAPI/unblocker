@@ -2,7 +2,7 @@
   "name": "unblocker",
   "version": "1.0.0",
   "description": "Read-only access to websites.",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node index.js",
     "dev": "node index.js",
