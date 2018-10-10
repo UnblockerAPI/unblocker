@@ -27,7 +27,7 @@
     "compression": "^1.7.3",
     "cross-env": "^5.2.0",
     "express": "^4.16.3",
-    "helmet": "^3.13.0",
+    "helmet": "^3.14.0",
     "request": "^2.88.0"
   }
 }
