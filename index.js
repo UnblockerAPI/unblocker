@@ -33,7 +33,7 @@ app.get('/', async (req, res) => {
 
         let targetUrl = new URL(decodedUrl);
 
-        let { isOk, headers } = await utils.checkAvailability({ url: targetUrl.href });
+        let { isOk, headers } = await utils.checkAvailability(targetUrl.href);
 
         if (!isOk) {
             return res.status(400).json({ success: false, reason: "Non200StatusCode" });
