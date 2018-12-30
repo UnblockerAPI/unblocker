@@ -1,0 +1,6 @@
+{
+  "name": "unblocker",
+  "version": 1,
+  "regions": ["bru"],
+  "public": true
+}
