@@ -22,7 +22,7 @@
     "node": "10.7.0",
     "npm": "6.8.0"
   },
-  "homepage": "https://unblocker.now.sh",
+  "homepage": "https://unblocker-frontend.herokuapp.com/",
   "dependencies": {
     "compression": "^1.7.4",
     "cross-env": "^5.2.0",

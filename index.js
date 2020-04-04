@@ -4,7 +4,7 @@ const path = require("path");
 const helmet = require("helmet");
 
 let isProduction = process.env.NODE_ENV === "production";
-let PORT = 8080;
+let PORT = process.env.PORT || 8080;
 let callbackFn = () => {
   console.log(`Listening on ${PORT}`);
 };
