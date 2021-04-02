@@ -16,7 +16,7 @@
   "bugs": {
     "url": "https://github.com/limitedeternity/unblocker/issues"
   },
-  "homepage": "https://unblocker-frontend.herokuapp.com/",
+  "homepage": "https://unblocker.vercel.app/",
   "dependencies": {
     "request": "^2.88.2"
   }
