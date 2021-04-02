@@ -18,6 +18,6 @@
   },
   "homepage": "https://unblocker-frontend.herokuapp.com/",
   "dependencies": {
-    "request": "^2.88.0"
+    "request": "^2.88.2"
   }
 }
