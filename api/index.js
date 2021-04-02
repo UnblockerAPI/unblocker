@@ -28,7 +28,7 @@ function checkAvailability(url) {
     });
 }
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
   try {
     let decodedUrl = Buffer.from(req.query.url, "base64").toString("ascii");
 
