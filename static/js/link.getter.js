@@ -42,7 +42,7 @@ $(document).ready(function() {
     }, 15000);
 
     var currentUrl = new URL(location.href);
-    currentUrl.searchParams.set("url", btoa(targetUrl.href));
+    currentUrl.pathname = btoa(targetUrl.href);
     location.href = currentUrl.href;
   });
 });

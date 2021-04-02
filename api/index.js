@@ -1,28 +1,34 @@
-const express = require("express");
-const compression = require("compression");
-const path = require("path");
-const helmet = require("helmet");
+const request = require("request");
 
-let isProduction = process.env.NODE_ENV === "production";
-let PORT = process.env.PORT || 8080;
-let callbackFn = () => {
-  console.log(`Listening on ${PORT}`);
-};
+function checkAvailability(url) {
+    return new Promise(resolve => {
+      let r = request({
+        method: "GET",
+        uri: url,
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3563.0 Safari/537.36"
+        }
+      });
 
-const utils = require("./modules/utils");
+      r.on("response", response => {
+        r.abort();
 
-const app = express();
-app.use(helmet());
-app.use(compression());
-app.use("/static", express.static(path.join(process.cwd(), "static")));
+        if (String(response.statusCode).match(/^(4|5)\d{2}$/)) {
+          return resolve({ isOk: false, headers: null });
+        }
 
-app.get("/", async (req, res) => {
-  if (!req.query.url) {
-    return res
-      .status(200)
-      .sendFile(path.join(process.cwd(), "templates", "index.html"));
-  }
+        return resolve({ isOk: true, headers: response.headers });
+      });
 
+      r.on("error", err => {
+        r.abort();
+        return resolve({ isOk: false, headers: null });
+      });
+    });
+}
+
+module.exports = (req, res) => {
   try {
     let decodedUrl = Buffer.from(req.query.url, "base64").toString("ascii");
 
@@ -35,9 +41,7 @@ app.get("/", async (req, res) => {
     }
 
     let targetUrl = new URL(decodedUrl);
-
-    let { isOk, headers } = await utils.checkAvailability(targetUrl.href);
-
+    let { isOk, headers } = await checkAvailability(targetUrl.href);
     if (!isOk) {
       return res
         .status(400)
@@ -68,6 +72,5 @@ app.get("/", async (req, res) => {
   } catch (e) {
     return res.status(400).json({ success: false, reason: "InvalidURL" });
   }
-});
+}
 
-app.listen(PORT, callbackFn);
