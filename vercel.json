@@ -1,7 +1,7 @@
 {
     "rewrites": [
         { "source": "/", "destination": "/index.html" },
-        { "source": "/:url", "destination": "/api" },
+        { "source": "/:url(.+)", "destination": "/api" },
         { "source": "/static/:dir*", "destination": "/static/:dir*" }
     ]
 }
